@@ -14,8 +14,16 @@ let rules = ([("*","BOX")],[("*","*");("BOX","*");("BOX","BOX")])
 
 let parse = let p = mkParser sorts in fun s -> match p s with Some t -> bind_up t | _ -> raise (Failure "")
 
-let _ = synthtype
-let _ = beta
 
-let _ = print_endline (pretty (synthtype rules Context.empty (parse "\\(y:\\/(x:*) x -> x) y")))
+let rec repl () =
+  print_string ">>> ";
+  let s = Stdlib.read_line () in
+  let e = parse s in
+  let t = synthtype rules Context.empty e in
+  let e' = Dynamics.beta Context.empty e in
+  print_endline (pretty t);
+  print_endline (pretty e');
+  print_string "\n";
+  repl ()
 
+let _ = repl ()
