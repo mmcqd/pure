@@ -60,13 +60,33 @@ let rec bind_up = function
   | PI ((x,t),e) -> PI ((x,bind_up t), bind x (bind_up e))
   | SORT s -> SORT s
 
+let paren s = "("^s^")"
+
+let rec binds y = function
+  | B i when i = y -> true
+  | B _ -> false
+  | F _ -> false
+  | APP (m,n) -> binds y m || binds y n
+  | ABS ((_,t),e) -> binds y t || binds (y+1) e
+  | PI ((_,t),e) -> binds y t || binds (y+1) e
+  | SORT _ -> false
+
+
 let rec pretty = function
   | F x -> x
   | B _ -> raise (Failure "whoops")
   | SORT s -> s
-  | APP (m,n) -> "("^pretty m^") "^pretty n
-  | ABS ((x,t),e) -> "(\\("^x^":"^pretty t^") "^pretty (instantiate (F x) e)^")"
-  | PI  ((x,t),e) -> "(\\/("^x^":"^pretty t^") "^pretty (instantiate (F x) e)^")"
+  | APP (m,n) -> 
+      begin
+      match (m,n) with
+        | (_,APP _) | (_, ABS _) | (_,PI _) -> pretty m^" "^paren (pretty n)
+        | (ABS _,_) | (PI _, _) -> paren (pretty m)^" "^pretty n
+        | _ -> pretty m^" "^pretty n
+      end
+  | ABS ((x,t),e) -> "\\("^x^":"^pretty t^") "^pretty (instantiate (F x) e)
+  | PI  ((x,t),e) ->
+      let v = if binds 0 e then "\\/("^x^":"^pretty t^")" else pretty t in
+      v ^" -> "^pretty (instantiate (F x) e)
 
 
 
