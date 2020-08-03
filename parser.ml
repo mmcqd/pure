@@ -10,7 +10,8 @@ let symbol s = post (string s)
 
 let variable = post @@ to_string @@ many1 letter
 
-let paren = between (symbol "(") (symbol ")") 
+let paren x = between (symbol "(") (symbol ")") x
+
 
 let mkParser sorts =
 
@@ -23,16 +24,18 @@ let mkParser sorts =
       and sort i = ((fun s -> SORT s) <$> List.fold_right (<|>) (List.map symbol sorts) fail) i
     
       and var i = ((fun v -> F v) <$> variable) i
-
-      and abs i = ((fun x t e -> ABS ((x,t),e)) <$> 
-                    (symbol "\\(" *> variable <* symbol ":") <*> 
-                    (expr <* symbol ")") <*> 
+ 
+      and abs i = ((fun (x,t) e -> ABS ((x,t),e)) <$> 
+                    (symbol "\\" *> paren arg) <*> 
                     expr) i
+      
 
-      and pi i = ((fun x t e -> PI ((x,t),e)) <$> 
-                   (symbol "\\/(" *> variable <* symbol ":") <*> 
-                   (expr <* symbol ")") <*> 
+      and pi i = ((fun (x,t) e -> PI ((x,t),e)) <$> 
+                   (symbol "\\/" *> paren arg) <*>
                    expr) i
+      
+      and arg i = ((fun x t -> (x,t)) <$> (variable <* symbol ":") <*> expr) i
+      
 
   in 
   fun s -> Option.map fst @@ List.find_opt (function (_,[]) -> true | _ -> false) (pre expr % s)
