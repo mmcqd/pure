@@ -1,2 +1,3 @@
 (executable
-  (name repl))
+  (name repl)
+  (libraries COMBI))

@@ -52,6 +52,13 @@ let rec beta g = function
         | (ABS ((x,_),e),n') -> let (f,e') = unbind x e in beta (g++(f,n')) e'
         | (m',n') -> APP (m',n')
 
+let rec bind_up = function
+  | F x -> F x
+  | B i -> B i
+  | APP (m,n) -> APP (bind_up m, bind_up n)
+  | ABS ((x,t),e) -> ABS ((x,bind_up t), bind x (bind_up e))
+  | PI ((x,t),e) -> PI ((x,bind_up t), bind x (bind_up e))
+  | SORT s -> SORT s
 
 let rec pretty = function
   | F x -> x
@@ -60,7 +67,6 @@ let rec pretty = function
   | APP (m,n) -> "("^pretty m^") "^pretty n
   | ABS ((x,t),e) -> "(\\("^x^":"^pretty t^") "^pretty (instantiate (F x) e)^")"
   | PI  ((x,t),e) -> "(\\/("^x^":"^pretty t^") "^pretty (instantiate (F x) e)^")"
-
 
 
 
