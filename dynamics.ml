@@ -7,7 +7,6 @@ let fresh =
   fun v -> (r := !r + 1; v ^ Int.to_string (!r))
 
 
-
 let instantiate y = 
   let rec replace b = function
   | F x -> F x

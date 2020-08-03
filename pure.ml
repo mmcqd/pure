@@ -17,7 +17,7 @@ let rec alpha_eq = function
   | (PI ((_,t),e), PI ((_,t'),e')) -> alpha_eq (t,t') && alpha_eq (e,e')
   | _ -> false
 
-module Context = Map.Make (struct include String end)
+module Context = Map.Make (String)
 let (++) g (x,t) = Context.add x t g 
 
 let rec to_string = function

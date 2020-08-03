@@ -1,5 +1,7 @@
 open Pure
-open COMBI.Parser.Make (COMBI.Parser.ListBase)
+
+
+include COMBI.Parser.Make (COMBI.Parser.ListBase)
 
 let whitespace = sat (fun c -> c = ' ' || c = '\n' || c = '\t')
 let ignore = consume @@ many whitespace
@@ -17,7 +19,7 @@ let bind_fold c (xs,t) = List.fold_right (fun x e' -> c ((x,t),e')) xs
 
 let multi_bind c = List.fold_right (fun (xs,t) e' -> bind_fold c (xs,t) e') 
 
-let mkParser sorts =
+let make sorts =
 
   let rec expr i = chainr1 expr1 (symbol "->" *> return (fun t1 t2 -> PI (("_",t1),t2))) i
     
@@ -41,9 +43,9 @@ let mkParser sorts =
       and args i = ((fun xs t -> (xs,t)) <$> 
                     (sepby1 variable (many1 whitespace) <* symbol ":") <*> expr) i
 
-
-  in 
-  fun s -> Option.map fst @@ List.find_opt (function (_,[]) -> true | _ -> false) (pre expr % s)
-
+  in let decl i = ((fun x y -> (x,y)) <$> 
+               (symbol "let" *> variable <* symbol "=") <*>
+               expr) i
+  in (pre decl, pre expr)
 
 
