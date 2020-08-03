@@ -8,10 +8,14 @@ let post p = p <* ignore
 
 let symbol s = post (string s)
 
-let variable = post @@ to_string @@ many1 letter
+let illegal = ['\\';'(';')';':';' ';' ';'\n';'-']
+let variable = post @@ to_string @@ many1 (sat (fun x -> not (List.mem x illegal)))
 
 let paren x = between (symbol "(") (symbol ")") x
 
+let bind_fold c (xs,t) = List.fold_right (fun x e' -> c ((x,t),e')) xs
+
+let multi_bind c = List.fold_right (fun (xs,t) e' -> bind_fold c (xs,t) e') 
 
 let mkParser sorts =
 
@@ -25,17 +29,18 @@ let mkParser sorts =
     
       and var i = ((fun v -> F v) <$> variable) i
  
-      and abs i = ((fun (x,t) e -> ABS ((x,t),e)) <$> 
-                    (symbol "\\" *> paren arg) <*> 
-                    expr) i
-      
-
-      and pi i = ((fun (x,t) e -> PI ((x,t),e)) <$> 
-                   (symbol "\\/" *> paren arg) <*>
+      and abs i = (multi_bind (fun (x,e) -> ABS (x,e)) <$> 
+                   (symbol "\\" *> many1 (paren args)) <*> 
                    expr) i
       
-      and arg i = ((fun x t -> (x,t)) <$> (variable <* symbol ":") <*> expr) i
-      
+
+      and pi i = (multi_bind (fun (x,e) -> PI (x,e)) <$> 
+                   (symbol "\\/" *> many1 (paren args)) <*>
+                   expr) i
+       
+      and args i = ((fun xs t -> (xs,t)) <$> 
+                    (sepby1 variable (many1 whitespace) <* symbol ":") <*> expr) i
+
 
   in 
   fun s -> Option.map fst @@ List.find_opt (function (_,[]) -> true | _ -> false) (pre expr % s)

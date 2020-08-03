@@ -74,7 +74,7 @@ let print_context = Context.iter (fun x t -> print_string ("("^x^":"^pretty t^")
 *)
 
 let rec beta g = function
-  | F x -> (match Context.find_opt x g with Some t -> t | _ -> F x)
+  | F x -> Option.value (Context.find_opt x g) ~default:(F x) 
   | B i -> B i
   | ABS ((x,t),e) -> let (f,e') = unbind x e in 
                      ABS ((f,beta g t),bind f (beta g e'))
