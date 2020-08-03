@@ -1,11 +1,11 @@
 
 open Pure
 
+let r = ref 0
 
-let fresh =
-  let r = ref 0 in
-  fun v -> (r := !r + 1; v ^ Int.to_string (!r))
+let fresh v = (r := !r + 1; v ^ Int.to_string (!r))
 
+let reset_var_stream () = r := 0
 
 let instantiate y = 
   let rec replace b = function
@@ -54,7 +54,7 @@ let rec binds y = function
 
 let rec pretty = function
   | F x -> x
-  | B _ -> raise (Failure "whoops")
+  | B i -> "BOUND "^ Int.to_string i
   | SORT s -> s
   | APP (m,n) -> 
       begin

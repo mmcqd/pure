@@ -24,12 +24,13 @@ let parse p s =
 
 let rec repl (g_dyn,g_stat) =
   print_string ">>> ";
+  reset_var_stream ();
   let s = Stdlib.read_line () in
   match parse dir_parser s with
     | EXP e ->
         begin
         let e = bind_up e in
-        let t = synthtype rules g_stat e in
+        let t = synthtype rules (beta g_dyn) g_stat e in
         let e' = beta g_dyn e in
         print_endline ("_ : " ^ pretty t);
         print_endline ("_ = " ^ pretty e');
@@ -38,7 +39,7 @@ let rec repl (g_dyn,g_stat) =
         end
     | DEC (x,e) ->
         let e = bind_up e in
-        let t = synthtype rules g_stat e in
+        let t = synthtype rules (beta g_dyn) g_stat e in
         let e' = beta g_dyn e in
         let (g_dyn',g_stat') = (g_dyn++(x,e'),g_stat++(x,t)) in
         print_endline (x ^" : " ^ pretty t);

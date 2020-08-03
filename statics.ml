@@ -12,9 +12,8 @@ let check_S (s1,s2) r =
   if List.mem (s1,s2) r then SORT s2 
   else raise (TypeError ("Illegal Pi Type: "^s2^" cannot depend on "^s1))
 
-let beta = beta Context.empty
 
-let synthtype (aa,ss) = 
+let synthtype (aa,ss) beta = 
   let rec synth g = function
     | F x -> (try Context.find x g with _ -> raise (TypeError ("Unbound Variable: "^x)))
     | B _ -> raise (Failure "Should never happen")
@@ -33,12 +32,15 @@ let synthtype (aa,ss) =
               begin 
               match beta (synth (g++(f,t)) e') with
                 | SORT s2 -> check_S (s1,s2) ss
-                | _ -> raise (TypeError "")
+                | _ -> raise (TypeError "Pi cannot produce term with non-sort type")
               end
-          | _ -> raise (TypeError "")
+          | _ -> raise (TypeError "Pi cannot bind variable with non-sort type")
         end
     |  APP (m,n) ->
         match (beta (synth g m),beta (synth g n)) with
-          | (PI ((x,t),e),t') -> if alpha_eq (t,t') then subst x n e else raise (TypeError "")
-          | _ -> raise (TypeError "")
+          | (PI ((x,t),e),t') ->
+              let (f,e') = unbind x e in 
+              if alpha_eq (t,t') then subst f n e' 
+              else raise (TypeError ("Expected "^pretty t^" but got "^pretty t'))
+          | _ -> raise (TypeError ("Operator is not a function, it cannot be applied"))
   in synth
