@@ -14,11 +14,12 @@ let beta = beta Context.empty
 
 let synthtype (aa,ss) = 
   let rec synth g = function
-    | F x -> Context.find x g
+    | F x -> (try Context.find x g with _ -> raise (TypeError "Unbound Variable"))
     | B _ -> raise (Failure "whoops")
     | SORT s -> check_A s aa
-    | ABS ((x,t),e) -> 
+    | ABS ((x,t),e) ->
         let (f,e') = unbind x e in
+        (*print_endline ("("^f^":"^pretty t^")");*)
         let t' = synth (g++(f,t)) e' in
         let r = PI ((f,t),bind f t') in
         let _ = synth g r in
@@ -27,8 +28,9 @@ let synthtype (aa,ss) =
         let (f,e') = unbind x e in
         begin
         match beta (synth g t) with
-          | SORT s1 -> 
+          | SORT s1 ->  
               begin 
+              (*print_endline ("("^f^":"^pretty t^")");*)
               match beta (synth (g++(f,t)) e') with
                 | SORT s2 -> check_S (s1,s2) ss
                 | _ -> raise (TypeError "")

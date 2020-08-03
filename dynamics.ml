@@ -7,6 +7,7 @@ let fresh =
   fun v -> (r := !r + 1; v ^ Int.to_string (!r))
 
 
+
 let instantiate y = 
   let rec replace b = function
   | F x -> F x
@@ -40,26 +41,6 @@ let rec subst y w = function
   | PI ((x,t),e) ->  PI ((x,subst y w t),subst y w e)
   | SORT s -> SORT s
 
-
-let rec beta g = function
-  | F x -> Context.find x g
-  | B i -> B i
-  | ABS ((x,t),e) -> let (f,e') = unbind x e in ABS ((f,beta g t),bind f (beta (g++(f,F f)) e'))
-  | PI ((x,t),e) -> let (f,e') = unbind x e in PI ((f,beta g t),bind f (beta (g++(f,F f)) e'))
-  | SORT s -> SORT s
-  | APP (m,n) ->
-      match (beta g m, beta g n) with
-        | (ABS ((x,_),e),n') -> let (f,e') = unbind x e in beta (g++(f,n')) e'
-        | (m',n') -> APP (m',n')
-
-let rec bind_up = function
-  | F x -> F x
-  | B i -> B i
-  | APP (m,n) -> APP (bind_up m, bind_up n)
-  | ABS ((x,t),e) -> ABS ((x,bind_up t), bind x (bind_up e))
-  | PI ((x,t),e) -> PI ((x,bind_up t), bind x (bind_up e))
-  | SORT s -> SORT s
-
 let paren s = "("^s^")"
 
 let rec binds y = function
@@ -85,8 +66,33 @@ let rec pretty = function
       end
   | ABS ((x,t),e) -> "\\("^x^":"^pretty t^") "^pretty (instantiate (F x) e)
   | PI  ((x,t),e) ->
-      let v = if binds 0 e then "\\/("^x^":"^pretty t^")" else pretty t in
-      v ^" -> "^pretty (instantiate (F x) e)
+      let v = if binds 0 e then "\\/("^x^":"^pretty t^") " else pretty t^" -> " in
+      v ^pretty (instantiate (F x) e)
+
+(*
+let print_context = Context.iter (fun x t -> print_string ("("^x^":"^pretty t^"),"))
+*)
+
+let rec beta g = function
+  | F x -> (match Context.find_opt x g with Some t -> t | _ -> F x)
+  | B i -> B i
+  | ABS ((x,t),e) -> let (f,e') = unbind x e in 
+                     ABS ((f,beta g t),bind f (beta g e'))
+  | PI ((x,t),e) -> let (f,e') = unbind x e in 
+                    PI ((f,beta g t),bind f (beta g e'))
+  | SORT s -> SORT s
+  | APP (m,n) ->
+      match (beta g m, beta g n) with
+        | (ABS ((x,_),e),n') -> let (f,e') = unbind x e in beta (g++(f,n')) e'
+        | (m',n') -> APP (m',n')
+
+let rec bind_up = function
+  | F x -> F x
+  | B i -> B i
+  | APP (m,n) -> APP (bind_up m, bind_up n)
+  | ABS ((x,t),e) -> ABS ((x,bind_up t), bind x (bind_up e))
+  | PI ((x,t),e) -> PI ((x,bind_up t), bind x (bind_up e))
+  | SORT s -> SORT s
 
 
 
