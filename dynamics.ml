@@ -47,26 +47,40 @@ let rec binds y = function
   | B _ -> false
   | F _ -> false
   | APP (m,n) -> binds y m || binds y n
-  | ABS ((_,t),e) -> binds y t || binds (y+1) e
-  | PI ((_,t),e) -> binds y t || binds (y+1) e
+  | ABS ((_,t),e) | PI ((_,t),e) -> binds y t || binds (y+1) e
   | SORT _ -> false
 
 
-let rec pretty = function
-  | F x -> x
-  | B i -> "BOUND "^ Int.to_string i
-  | SORT s -> s
-  | APP (m,n) -> 
-      begin
-      match (m,n) with
-        | (_,APP _) | (_, ABS _) | (_,PI _) -> pretty m^" "^paren (pretty n)
-        | (ABS _,_) | (PI _, _) -> paren (pretty m)^" "^pretty n
-        | _ -> pretty m^" "^pretty n
-      end
-  | ABS ((x,t),e) -> "\\("^x^":"^pretty t^") "^pretty (instantiate (F x) e)
-  | PI  ((x,t),e) ->
-      let v = if binds 0 e then "\\/("^x^":"^pretty t^") " else pretty t^" -> " in
-      v ^pretty (instantiate (F x) e)
+
+let rec free_in y = function
+  | F x when x = y -> true
+  | F _ -> false
+  | B _ -> false
+  | APP (m,n) -> free_in y m || free_in y n
+  | ABS ((_,t),e) | PI ((_,t),e) -> free_in y t || free_in y e
+  | SORT _ -> false 
+
+let pretty s = reset_var_stream ();
+  let rec pretty = function
+    | F x -> x
+    | B _ -> raise (Failure "Shouldn't be printing bound vars")
+    | SORT s -> s
+    | APP (m,n) -> 
+        begin
+        match (m,n) with
+          | (_,APP _) | (_, ABS _) | (_,PI _) -> pretty m^" "^paren (pretty n)
+          | (ABS _,_) | (PI _, _) -> paren (pretty m)^" "^pretty n
+          | _ -> pretty m^" "^pretty n
+        end
+    | ABS ((x,t),e) -> 
+        let x' = if free_in x e then fresh x else x in
+        "\\("^x'^":"^pretty t^") "^pretty (instantiate (F x') e)
+    | PI  ((x,t),e) ->
+        let x' = if free_in x e then fresh x else x in
+        let v = if binds 0 e then "\\/("^x'^":"^pretty t^") " else pretty t^" -> " in
+        v ^pretty (instantiate (F x') e)
+  
+  in pretty s
 
 (*
 let print_context = Context.iter (fun x t -> print_string ("("^x^":"^pretty t^"),"))
@@ -76,9 +90,9 @@ let rec beta g = function
   | F x -> Option.value (Context.find_opt x g) ~default:(F x) 
   | B i -> B i
   | ABS ((x,t),e) -> let (f,e') = unbind x e in 
-                     ABS ((f,beta g t),bind f (beta g e'))
+                     ABS ((x,beta g t),bind f (beta g e'))
   | PI ((x,t),e) -> let (f,e') = unbind x e in 
-                    PI ((f,beta g t),bind f (beta g e'))
+                    PI ((x,beta g t),bind f (beta g e'))
   | SORT s -> SORT s
   | APP (m,n) ->
       match (beta g m, beta g n) with

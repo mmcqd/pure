@@ -1,8 +1,8 @@
 
-let T = \/(A:Prop) A -> A
+let T = \/(A : Prop) A -> A
 
-let f = \(x:Prop) x
+let f = \(x : Prop) x
 
 let & = \(A B : Prop)\/(C : Prop) (A -> B -> C) -> C
 
-
+let pair = \(A B : Prop)(x : A)(y : B)(C : Prop)(z : A -> B -> C) z x y

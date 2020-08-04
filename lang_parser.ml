@@ -1,7 +1,10 @@
+
+module Make (P : COMBI.Parser.S) =
+struct
+(*include COMBI.Parser.Make (COMBI.Parser.ListBase)*)
+
 open Pure
-
-
-include COMBI.Parser.Make (COMBI.Parser.ListBase)
+include P
 
 let whitespace = sat (fun c -> c = ' ' || c = '\n' || c = '\t')
 let ignore = consume @@ many whitespace
@@ -20,7 +23,7 @@ let paren x = between (symbol "(") (symbol ")") x
 
 let bind_fold c (xs,t) = List.fold_right (fun x e' -> c ((x,t),e')) xs
 
-let multi_bind c = List.fold_right (fun (xs,t) e' -> bind_fold c (xs,t) e') 
+let multi_bind c = List.fold_right (bind_fold c)
 
 let make sorts =
 
@@ -44,11 +47,11 @@ let make sorts =
                    expr) i
        
       and args i = ((fun xs t -> (xs,t)) <$> 
-                    (sepby1 variable (many1 whitespace) <* symbol ":") <*> expr) i
+                    (many1 variable <* symbol ":") <*> expr) i
 
   in let decl i = ((fun x y -> (x,y)) <$> 
                (symbol "let" *> variable <* symbol "=") <*>
                expr) i
   in (pre decl, pre expr)
 
-
+end

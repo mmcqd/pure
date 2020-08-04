@@ -21,7 +21,7 @@ let synthtype (aa,ss) beta =
     | ABS ((x,t),e) ->
         let (f,e') = unbind x e in
         let t' = synth (g++(f,t)) e' in
-        let r = PI ((f,t),bind f t') in
+        let r = PI ((x,t),bind f t') in
         let _ = synth g r in
         r
     | PI ((x,t),e) ->

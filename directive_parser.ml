@@ -1,4 +1,8 @@
-open Lang_parser
+
+module Make (P : COMBI.Parser.S) =
+struct
+module LP = Lang_parser.Make (P)
+open LP
 open Pure
 
 type directive = 
@@ -7,9 +11,8 @@ type directive =
 
 
 let make rules =
-  let (dec,exp) = Lang_parser.make rules in
+  let (dec,exp) = LP.make rules in
   (((fun (x,y) -> DEC (x,y)) <$> dec) <|> ((fun x -> EXP x) <$> exp),dec,exp)
 
 
-
-
+end

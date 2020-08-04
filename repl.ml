@@ -1,7 +1,8 @@
 open Dynamics
 open Statics
-open Lang_parser
-open Directive_parser
+module DP = Directive_parser.Make (COMBI.Parser.Make (COMBI.Parser.OptionBase))
+open DP
+open LP
 open Pure
 
 exception ParseError
@@ -10,10 +11,16 @@ let sorts = ["Prop";"Type"]
 let rules = ([("Prop","Type")],
              [("Prop","Prop");("Type","Prop");("Type","Type");("Prop","Type")])
 
-let (dir_parser,dec_parser,exp_parser) = Directive_parser.make sorts
+let (dir_parser,dec_parser,exp_parser) = DP.make sorts
 
+(*
 let parse_opt p s = 
    Option.map fst @@ List.find_opt (function (_,[]) -> true | _ -> false) (p % s)
+*)
+let parse_opt p s =
+  match p % s with
+    | Some (x,[]) -> Some x
+    | _ -> None
 
 let parse p s = 
   match parse_opt p s with
@@ -48,7 +55,6 @@ let parse_file f =
 let rec repl (g_dyn,g_stat) =
   try
   print_string ">>> ";
-  reset_var_stream ();
   let s = Stdlib.read_line () in
   match parse dir_parser s with
     | EXP e ->
