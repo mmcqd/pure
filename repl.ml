@@ -42,7 +42,6 @@ let fold_decs =
     let t = synthtype rules (beta g_dyn) g_stat e in
     let e' = beta g_dyn e in
     print_endline (x ^ " : " ^ pretty t);
-    print_endline (x ^ " = " ^ pretty e');
     print_string "\n";
     (g_dyn++(x,e'),g_stat++(x,t))
   ) (Context.empty,Context.empty)

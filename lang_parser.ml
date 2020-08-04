@@ -13,7 +13,7 @@ let post p = p <* ignore
 
 let symbol s = post (string s)
 
-let illegal_chr = ['\\';'(';')';':';' ';'\t';'\n';'=';'-']
+let illegal_chr = ['\\';'(';')';':';' ';'\t';'\n']
 let ident = to_string @@ many1 (sat (fun x -> not (List.mem x illegal_chr)))
 
 let illegal_str = ["let";"->"]

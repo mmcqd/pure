@@ -77,8 +77,10 @@ let pretty s = reset_var_stream ();
         "\\("^x'^":"^pretty t^") "^pretty (instantiate (F x') e)
     | PI  ((x,t),e) ->
         let x' = if free_in x e then fresh x else x in
-        let v = if binds 0 e then "\\/("^x'^":"^pretty t^") " else pretty t^" -> " in
-        v ^pretty (instantiate (F x') e)
+        if binds 0 e then "\\/("^x'^":"^pretty t^") "^pretty (instantiate (F x') e)
+        else match t with
+              | PI _ -> paren (pretty t)^" -> "^pretty (instantiate (F x') e)
+              | _ -> pretty t^" -> "^pretty (instantiate (F x') e)
   
   in pretty s
 
