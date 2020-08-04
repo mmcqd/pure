@@ -1,5 +1,5 @@
 
-
+exception TypeError of string
 
 val synthtype : (string * string) list * (string * string) list ->
                 (Pure.term -> Pure.term) ->

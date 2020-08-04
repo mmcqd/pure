@@ -1,7 +1,8 @@
-let T : Prop
+
 let T = \/(A:Prop) A -> A
 
-let f : T -> T
-let f = \(x : T) x
+let f = \(x:Prop) x
+
+let & = \(A B : Prop)\/(C : Prop) (A -> B -> C) -> C
 
 

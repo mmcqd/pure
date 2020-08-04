@@ -10,8 +10,11 @@ let post p = p <* ignore
 
 let symbol s = post (string s)
 
-let illegal = ['\\';'(';')';':';' ';' ';'\n';'-']
-let variable = post @@ to_string @@ many1 (sat (fun x -> not (List.mem x illegal)))
+let illegal_chr = ['\\';'(';')';':';' ';'\t';'\n';'=';'-']
+let ident = to_string @@ many1 (sat (fun x -> not (List.mem x illegal_chr)))
+
+let illegal_str = ["let";"->"]
+let variable = post (ident >>= (fun v -> if List.mem v illegal_str then fail else return v))
 
 let paren x = between (symbol "(") (symbol ")") x
 

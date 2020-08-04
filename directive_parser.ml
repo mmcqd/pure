@@ -8,7 +8,7 @@ type directive =
 
 let make rules =
   let (dec,exp) = Lang_parser.make rules in
-  ((fun (x,y) -> DEC (x,y)) <$> dec) <|> ((fun x -> EXP x) <$> exp) 
+  (((fun (x,y) -> DEC (x,y)) <$> dec) <|> ((fun x -> EXP x) <$> exp),dec,exp)
 
 
 

@@ -10,7 +10,7 @@ let sorts = ["Prop";"Type"]
 let rules = ([("Prop","Type")],
              [("Prop","Prop");("Type","Prop");("Type","Type");("Prop","Type")])
 
-let dir_parser = Directive_parser.make sorts
+let (dir_parser,dec_parser,exp_parser) = Directive_parser.make sorts
 
 let parse_opt p s = 
    Option.map fst @@ List.find_opt (function (_,[]) -> true | _ -> false) (p % s)
@@ -20,9 +20,33 @@ let parse p s =
     | Some t -> t
     | None -> raise ParseError
 
+let file_parser = many1 dec_parser
+
+let read_file f =
+  let ch = open_in f in
+  let s = really_input_string ch (in_channel_length ch) in
+  close_in ch;
+  s
+
+let fold_decs = 
+  List.fold_left 
+  (fun (g_dyn,g_stat) (x,e) ->
+    let e = bind_up e in
+    let t = synthtype rules (beta g_dyn) g_stat e in
+    let e' = beta g_dyn e in
+    print_endline (x ^" : " ^ pretty t);
+    print_string "\n";
+    (g_dyn++(x,e'),g_stat++(x,t))
+  ) (Context.empty,Context.empty)
+    
+let parse_file f =
+  let s = read_file f in
+  let ds = parse file_parser s in
+  fold_decs ds
 
 
 let rec repl (g_dyn,g_stat) =
+  try
   print_string ">>> ";
   reset_var_stream ();
   let s = Stdlib.read_line () in
@@ -46,6 +70,11 @@ let rec repl (g_dyn,g_stat) =
         print_endline (x ^ " = " ^ pretty e');
         print_string "\n";
         repl (g_dyn',g_stat')
-    
-
-let _ = repl (Context.empty, Context.empty)
+  with | ParseError -> print_endline "Parse Error"; repl (g_dyn,g_stat)
+       | TypeError e -> print_endline ("Type Error: "^e); repl (g_dyn,g_stat)
+  
+let _ = if Array.length Sys.argv > 1 then 
+        let file = Sys.argv.(1) in
+        let gs = parse_file file in
+        repl gs
+        else repl (Context.empty, Context.empty)
