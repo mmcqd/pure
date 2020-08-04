@@ -54,8 +54,9 @@ let parse_file f =
 
 let rec repl (g_dyn,g_stat) =
   try
-  print_string ">>> ";
+  print_string "-- ";
   let s = Stdlib.read_line () in
+  if s = "" then repl (g_dyn,g_stat) else
   match parse dir_parser s with
     | EXP e ->
         begin
