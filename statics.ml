@@ -45,5 +45,5 @@ let synthtype (aa,ss) beta =
               else raise (TypeError 
               ("Expected '"^pretty n^"' to have type '"^pretty t^"' but it has type '"^pretty t'^"' in expression: '"^pretty (APP (m,n))^"'"))
           
-          | _ -> raise (TypeError ("Operator is not a function, it cannot be applied"))
+          | (t,_) -> raise (TypeError ("'"^pretty m^"' has type '"^pretty t^"'. It is not a function, it cannot be applied"))
   in synth

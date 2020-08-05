@@ -26,7 +26,7 @@ let multi_bind c = List.fold_right (bind_fold c)
 
 let make sorts =
 
-  let rec expr i = chainr1 expr1 (symbol "->" *> return (fun t1 t2 -> PI (("_",t1),t2))) i
+  let rec expr i = chainr1 expr1 (symbol "->" *> return (fun t1 t2 -> PI (("",t1),t2))) i
     
       and expr1 i = chainl1 expr2 (return (fun m n -> APP (m,n))) i
 
