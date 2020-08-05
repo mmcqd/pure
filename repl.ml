@@ -48,18 +48,12 @@ let fold_decs rules =
     
 let parse_file f =
   let s = read_file f in
-  match sorts % s with
-    | None -> raise (Failure "Please specify sorts")
-    | Some (ss,t) ->
-        match axioms t with
-          | None -> raise (Failure "Please specify axioms")
-          | Some (ax,t) ->
-            match rules t with
-              | None -> raise (Failure "Please specify rules")
-              | Some (rs,t) ->
-                  let (dir,dec,_) = DP.make ss in
-                    let ds = parse' (many dec) t in
-                    (fold_decs (ax,rs) ds, dir, (ax,rs))
+  match pragmas % s with
+    | None -> raise (Failure "Missing SORTS, AXIOMS, or RULES")
+    | Some ((ss,ax,rs),t) ->
+      let (dir,dec,_) = DP.make ss in
+        let ds = parse' (many dec) t in
+        (fold_decs (ax,rs) ds, dir, (ax,rs))
 
 
 let repl rules dir_parser =

@@ -17,6 +17,8 @@ let sorts = pre (symbol "%SORTS" *> sepby1 variable (symbol "|"))
 let axioms = pre (symbol "%AXIOMS" *> sepby1 ax (symbol "|"))
 let rules = pre (symbol "%RULES" *> sepby1 rule (symbol "|"))
 
+let pragmas = (fun x y z -> (x,y,z)) <$> sorts <*> axioms <*> rules
+
 let make rs =
   let (dec,exp) = LP.make rs in
   (((fun (x,y) -> DEC (x,y)) <$> dec) <|> 
