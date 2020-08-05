@@ -56,8 +56,9 @@ let synthtype (aa,ss) beta =
                               
 
       and check g = function
-        | LAM (x,e), (PI ((_,a),b) as t) -> let (f,e') = unbind x e in
-                                            go @@ check (g++(f,a)) (e',b); go @@ synth g t; t
+        | LAM (x,e), (PI ((y,a),b) as t) -> let (f,e') = unbind x e in
+                                            let (h,b') = unbind y b in
+                                            go @@ check (g++(f,a)++(h,a)) (e',b'); go @@ synth g t; t
         | m,b -> go @@ synth g b; let a = synth g m in if alpha_eq (beta a, beta b) then b 
                  else raise (TypeError ("'"^pretty a^"' does not equal '"^pretty b^"'"))
   in synth

@@ -80,16 +80,13 @@ let pretty s = reset_var_stream ();
     | APP (m,n) -> 
         begin
         match (m,n) with
-          | (_,APP _) | (_, ALAM _) | (_,PI _) -> pretty m^" "^paren (pretty n)
-          | (ALAM _,_) | (PI _, _) -> paren (pretty m)^" "^pretty n
+          | (_,APP _) | (_, ALAM _) | (_, LAM _) | (_,PI _) -> pretty m^" "^paren (pretty n)
+          | (ALAM _,_) | (LAM _ , _ ) | (PI _, _) -> paren (pretty m)^" "^pretty n
           | _ -> pretty m^" "^pretty n
         end
-    | LAM (x,e) -> 
+    | LAM (x,e) | ALAM ((x,_),e) -> 
         let x' = if free_in x e then fresh x else x in
         "\\("^x'^") "^pretty (instantiate (F x') e)
-    | ALAM ((x,t),e) -> 
-        let x' = if free_in x e then fresh x else x in
-        "\\("^x'^":"^pretty t^") "^pretty (instantiate (F x') e)
     | PI  ((x,t),e) ->
         let x' = if free_in x e then fresh x else x in
         if binds 0 e then "\\/("^x'^":"^pretty t^") "^pretty (instantiate (F x') e)
@@ -98,10 +95,6 @@ let pretty s = reset_var_stream ();
               | _ -> pretty t^" -> "^pretty (instantiate (F x') e)
   
   in pretty s
-
-(*
-let print_context = Context.iter (fun x t -> print_string ("("^x^":"^pretty t^"),"))
-*)
 
 let rec beta g = function
   | F x -> Option.value (Context.find_opt x g) ~default:(F x) 
@@ -116,7 +109,7 @@ let rec beta g = function
   | SORT s -> SORT s
   | APP (m,n) ->
       match (beta g m, beta g n) with
-        | (ALAM ((x,_),e),n') -> let (f,e') = unbind x e in beta (g++(f,n')) e'
+        | (ALAM ((x,_),e),n') | (LAM (x,e),n') -> let (f,e') = unbind x e in beta (g++(f,n')) e'
         | (m',n') -> APP (m',n')
 
 let rec bind_up = function

@@ -46,16 +46,16 @@ let Sym   = \(R : \/(A:Prop) A -> A -> Prop) \/(A : Prop)(x y : A) R A x y -> R 
 let Trans = \(R : \/(A:Prop) A -> A -> Prop) \/(A : Prop)(x y z : A) R A x y -> R A y z -> R A x z
 
 
-let == = \(A : Prop)(x y : A) \/(P : A -> Prop) P x -> P y
+let Eq = \(A : Prop)(x y : A) \/(P : A -> Prop) P x -> P y
 
 let eq-refl = \(A : Prop)(x : A)(P : A -> Prop) id (P x)
 
 let eq-sym = 
-  \(A : Prop)(x y : A)(eq : == A x y)(P : A -> Prop)
+  \(A : Prop)(x y : A)(eq : Eq A x y)(P : A -> Prop)
     eq (\(z : A) P z -> P x) (id (P x))
 
 let eq-trans =
-  \(A : Prop)(x y z : A)(eq1 : == A x y)(eq2 : == A y z)(P : A -> Prop)
+  \(A : Prop)(x y z : A)(eq1 : Eq A x y)(eq2 : Eq A y z)(P : A -> Prop)
     >>> (P x) (P y) (P z) (eq1 P) (eq2 P)
 
 

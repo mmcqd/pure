@@ -17,10 +17,12 @@ let (dir_parser,dec_parser,exp_parser) = DP.make default_sorts
 let parse_opt p s = 
    Option.map fst @@ List.find_opt (function (_,[]) -> true | _ -> false) (p % s)
 *)
+let implode cl = String.concat "" (List.map (String.make 1) cl)
 
 let parse p s = 
   match p % s with
     | Some (t,[]) -> t
+    | Some (_,s) -> print_endline ("REST: "^implode s);raise ParseError
     | _ -> raise ParseError
 
 let parse' p s =
@@ -39,7 +41,6 @@ let fold_decs rules =
   List.fold_left 
   (fun (g_dyn,g_stat) (x,e) ->
     let e = bind_up e in
-    print_endline (pretty e);
     let t = synthtype rules (beta g_dyn) g_stat e in
     let e' = beta g_dyn e in
     print_endline (x ^ " : " ^ pretty t);
