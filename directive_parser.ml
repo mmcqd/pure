@@ -13,11 +13,11 @@ type directive =
 let pair p s = (fun x y -> (x,y)) <$> (p <* s) <*> p
 let ax = pair variable (symbol ":")
 let rule = pair variable (symbol "~>")
-let sorts = pre (symbol "%SORTS" *> sepby1 variable (symbol "|"))
-let axioms = pre (symbol "%AXIOMS" *> sepby1 ax (symbol "|"))
-let rules = pre (symbol "%RULES" *> sepby1 rule (symbol "|"))
+let sorts = symbol "%SORTS" *> sepby1 variable (symbol "|")
+let axioms = symbol "%AXIOMS" *> sepby1 ax (symbol "|")
+let rules = symbol "%RULES" *> sepby1 rule (symbol "|")
 
-let pragmas = (fun x y z -> (x,y,z)) <$> sorts <*> axioms <*> rules
+let pragmas = pre ((fun x y z -> (x,y,z)) <$> sorts <*> axioms <*> rules)
 
 let make rs =
   let (dec,exp) = LP.make rs in

@@ -1,5 +1,3 @@
-
-
 %SORTS Prop | Type
 %AXIOMS Prop : Type
 %RULES Prop ~> Prop | Prop ~> Type | Type ~> Prop | Type ~> Type
@@ -42,6 +40,9 @@ let eq-sym =
 let eq-trans =
   \(A : Prop)(x y z : A)(eq1 : == A x y)(eq2 : == A y z)(P : A -> Prop)
     >>> (P x) (P y) (P z) (eq1 P) (eq2 P)
+
+
+
 
 
 
