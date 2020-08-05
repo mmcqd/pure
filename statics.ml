@@ -14,6 +14,40 @@ let check_S (s1,s2) r =
   ("Illegal Pi Type: value of type '"^s2^"' cannot depend on value of type '"^s1^"'"))
 
 
+
+let make (aa,ss) beta =
+  let rec synth g = function
+        | SORT s -> check_A s aa
+        | F x -> match Context.find_opt x g with Some a -> synth g a; a | _ -> raise (TypeError "")
+        | B _ -> raise (Failure "Should never be type checking a bound var")
+        | ANNOT (e,t) -> check g (e,t)
+        | PI ((x,t),e) -> 
+            let (f,e') = unbind x e in
+            let s1 = synth g t in
+            let s2 = synth (g ++ (f,t)) e' in
+            check_S (s1,s2) ss; s2
+
+        | APP (m,n) -> 
+            begin
+            match synth g m with
+              | PI ((x,t),e) -> check g (n,t); subst x n e
+              | _ -> raise (TypeError "")
+            end
+        | ALAM ((x,t),e) ->
+            let (f,e') = unbind x e in
+            let b = synth (g ++ (f,t)) e' in
+            let r = PI ((x,t),bind f b) in
+            synth g r; r
+
+        | x -> raise (TypeError "Cannot infer type for: '"^x^"'"
+                              
+
+      and check g = function
+        | LAM (x,e), (PI ((y,a),b) as t) -> check (g++(x,a)) b; synth g t; t
+        | m,b -> synth g b; let a = synth g m in if alpha_eq (beta a, beta b) then b else raise (TypeError "")
+  in (synth,check)
+
+(*
 let synthtype (aa,ss) beta = 
   let rec synth g = function
     | F x -> (try Context.find x g with _ -> raise (TypeError ("Unbound Variable: '"^x^"'")))
@@ -47,3 +81,4 @@ let synthtype (aa,ss) beta =
           
           | (t,_) -> raise (TypeError ("'"^pretty m^"' has type '"^pretty t^"'. It is not a function, it cannot be applied"))
   in synth
+*)

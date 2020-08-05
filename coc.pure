@@ -11,7 +11,10 @@ let id = <>
 
 let F = \/(A : Prop) A
 
+
 let >>> = \(A B C : Prop)(f : A -> B)(g : B -> C)(x : A) g (f x) 
+
+
 let & = \(A B : Prop) \/(C : Prop) (A -> B -> C) -> C
 
 let pair = \(A B : Prop)(x : A)(y : B)(C : Prop)(e : A -> B -> C) e x y
@@ -20,14 +23,30 @@ let fst = \(A B : Prop)(p : & A B) p A (\(x:A)(y:B) x)
 
 let snd = \(A B : Prop)(p : & A B) p B (\(x:A)(y:B) y)
 
+
+let + = \(A B : Prop) \/(C : Prop) (A -> C) -> (B -> C) -> C
+
+let inl = \(A B : Prop)(x : A)(C : Prop)(e1 : A -> C)(_ : B -> C) e1 x
+
+let inr = \(A B : Prop)(y : B)(C : Prop)(_ : A -> C)(e2 : B -> C) e2 y
+
+let case = \(A B C : Prop)(s : + A B)(e1 : A -> C)(e2 : B -> C) s C e1 e2
+
+
+
 let curry = \(A B C : Prop)(f : & A B -> C)(x : A)(y : B) f (pair A B x y)
 
 let uncurry = \(A B C : Prop)(f : A -> B -> C)(p : & A B) f (fst A B p) (snd A B p)
 
+
 let Bin-Rel = \/(A : Prop) A -> A -> Prop
+
 let Refl  = \(R : Bin-Rel) \/(A : Prop)(x : A) R A x x
+
 let Sym   = \(R : Bin-Rel) \/(A : Prop)(x y : A) R A x y -> R A y x
+
 let Trans = \(R : Bin-Rel) \/(A : Prop)(x y z : A) R A x y -> R A y z -> R A x z
+
 
 let == = \(A : Prop)(x y : A) \/(P : A -> Prop) P x -> P y
 

@@ -39,7 +39,7 @@ let fold_decs rules =
   List.fold_left 
   (fun (g_dyn,g_stat) (x,e) ->
     let e = bind_up e in
-    let t = synthtype rules (beta g_dyn) g_stat e in
+    let t = synth rules (beta g_dyn) g_stat e in
     let e' = beta g_dyn e in
     print_endline (x ^ " : " ^ pretty t);
     print_string "\n";
@@ -66,7 +66,7 @@ let repl rules dir_parser =
       | EXP e ->
           begin
           let e = bind_up e in
-          let t = synthtype rules (beta g_dyn) g_stat e in
+          let t = synth rules (beta g_dyn) g_stat e in
           let e' = beta g_dyn e in
           print_endline ("_ : " ^ pretty t);
           print_endline ("_ = " ^ pretty e');
@@ -75,7 +75,7 @@ let repl rules dir_parser =
           end
       | DEC (x,e) ->
           let e = bind_up e in
-          let t = synthtype rules (beta g_dyn) g_stat e in
+          let t = synth rules (beta g_dyn) g_stat e in
           let e' = beta g_dyn e in
           let (g_dyn',g_stat') = (g_dyn++(x,e'),g_stat++(x,t)) in
           print_endline (x ^" : " ^ pretty t);
