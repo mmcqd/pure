@@ -3,60 +3,76 @@
 %RULES Prop ~> Prop | Prop ~> Type | Type ~> Prop | Type ~> Type
 
 
-let T = \/(A : Prop) A -> A
+let T : Prop 
+= \/(A : Prop) A -> A
 
-let <> = \(A : Prop)(x : A) x
+let <> : T 
+= \(_ x) x
 
-let id = <>
+let id : T 
+= <>
 
-let F = \/(A : Prop) A
-
-
-let >>> = \(A B C : Prop)(f : A -> B)(g : B -> C)(x : A) g (f x) 
-
-
-let & = \(A B : Prop) \/(C : Prop) (A -> B -> C) -> C
-
-let pair = \(A B : Prop)(x : A)(y : B)(C : Prop)(e : A -> B -> C) e x y
-
-let fst = \(A B : Prop)(p : & A B) p A (\(x:A)(y:B) x)
-
-let snd = \(A B : Prop)(p : & A B) p B (\(x:A)(y:B) y)
+let F : Prop
+= \/(A : Prop) A
 
 
-let + = \(A B : Prop) \/(C : Prop) (A -> C) -> (B -> C) -> C
-
-let inl = \(A B : Prop)(x : A)(C : Prop)(e1 : A -> C)(_ : B -> C) e1 x
-
-let inr = \(A B : Prop)(y : B)(C : Prop)(_ : A -> C)(e2 : B -> C) e2 y
-
-let case = \(A B C : Prop)(s : + A B)(e1 : A -> C)(e2 : B -> C) s C e1 e2
+let >>> : \/(A B C : Prop) (A -> B) -> (B -> C) -> A -> C 
+        = \(_ _ _ f g x) g (f x) 
 
 
+let & : Prop -> Prop -> Prop 
+= \(A B) \/(C : Prop) (A -> B -> C) -> C
 
-let curry = \(A B C : Prop)(f : & A B -> C)(x : A)(y : B) f (pair A B x y)
+let pair : \/(A B : Prop) A -> B -> & A B
+= \(_ _ x y)\(_ e) e x y
 
-let uncurry = \(A B C : Prop)(f : A -> B -> C)(p : & A B) f (fst A B p) (snd A B p)
+let fst : \/(A B : Prop) & A B -> A 
+= \(A _ p) p A (\(x _) x)
 
-
-let Refl  = \(R : \/(A:Prop) A -> A -> Prop) \/(A : Prop)(x : A) R A x x
-
-let Sym   = \(R : \/(A:Prop) A -> A -> Prop) \/(A : Prop)(x y : A) R A x y -> R A y x
-
-let Trans = \(R : \/(A:Prop) A -> A -> Prop) \/(A : Prop)(x y z : A) R A x y -> R A y z -> R A x z
+let snd : \/(A B : Prop) & A B -> B
+= \(_ B p) p B (\(_ y) y)
 
 
-let Eq = \(A : Prop)(x y : A) \/(P : A -> Prop) P x -> P y
+let + : Prop -> Prop -> Prop
+= \(A B) \/(C : Prop) (A -> C) -> (B -> C) -> C
 
-let eq-refl = \(A : Prop)(x : A)(P : A -> Prop) id (P x)
+let inl : \/(A B : Prop) A -> + A B
+= \(_ _ x)\(_ e _) e x
 
-let eq-sym = 
-  \(A : Prop)(x y : A)(eq : Eq A x y)(P : A -> Prop)
-    eq (\(z : A) P z -> P x) (id (P x))
+let inr : \/(A B : Prop) B -> + A B
+= \(_ _ y)\(_ _ e) e y 
 
-let eq-trans =
-  \(A : Prop)(x y z : A)(eq1 : Eq A x y)(eq2 : Eq A y z)(P : A -> Prop)
-    >>> (P x) (P y) (P z) (eq1 P) (eq2 P)
+let case : \/(A B C : Prop) + A B -> (A -> C) -> (B -> C) -> C
+= \(_ _ C s e1 e2) s C e1 e2
+
+
+let curry : \/(A B C : Prop) (& A B -> C) -> A -> B -> C
+= \(A B _ f x y) f (pair A B x y)
+
+let uncurry : \/(A B C : Prop) (A -> B -> C) -> & A B -> C
+= \(A B _ f p) f (fst A B p) (snd A B p)
+
+let Refl : (\/(A : Prop) A -> A -> Prop) -> Prop 
+= \(R) \/(A : Prop)(x : A) R A x x
+
+let Sym : (\/(A : Prop) A -> A -> Prop) -> Prop  
+= \(R) \/(A : Prop)(x y : A) R A x y -> R A y x
+
+let Trans : (\/(A : Prop) A -> A -> Prop) -> Prop 
+= \(R) \/(A : Prop)(x y z : A) R A x y -> R A y z -> R A x z
+
+
+let Eq : \/(A : Prop) A -> A -> Prop
+= \(A x y) \/(P : A -> Prop) P x -> P y
+
+let eq-refl : Refl Eq
+= \(A x)\(P) id (P x)
+
+let eq-sym : Sym Eq 
+= \(A x y eq)\(P) eq (\(z) P z -> P x) (eq-refl A x P)
+
+let eq-trans : Trans Eq 
+= \(A x y z eq1 eq2)\(P) >>> (P x) (P y) (P z) (eq1 P) (eq2 P)
 
 
 
