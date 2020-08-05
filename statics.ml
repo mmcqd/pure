@@ -26,7 +26,7 @@ let synthtype (aa,ss) beta =
               | _ -> raise (TypeError ("Unbound var: '"^x^"'"))
             end
         | B _ -> raise (Failure "Should never be type checking a bound var")
-        | ANNOT (e,t) -> go @@ check g (e,beta t);t
+        | ANNOT (e,t) -> go @@ synth g t; go @@ check g (e,beta t);t
         | PI ((x,t),e) -> 
             let (f,e') = unbind x e in
             begin
@@ -44,7 +44,7 @@ let synthtype (aa,ss) beta =
             match beta @@ synth g m with
               | PI ((x,t),e) -> let (f,e') = unbind x e in
                                 go @@ check g (n,t); subst f n e'
-              | t -> raise (TypeError ("'"^pretty m^"' has type '"^pretty t^"'. It is not a function, it cannot be applied"))
+              | t -> raise (TypeError ("In expresion '"^pretty (APP (m,n))^"', '"^pretty m^"' has type '"^pretty t^"'. It is not a function, it cannot be applied"))
             end
         | ALAM ((x,t),e) ->
             let (f,e') = unbind x e in

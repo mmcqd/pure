@@ -3,3 +3,21 @@
 %RULES Type ~> Type | Kind ~> Type
 
 
+let Nat : Type = \/(A : Type) (A -> A) -> A -> A
+
+let 0 : Nat = \(A f x) x
+let Z : Nat = 0
+
+let S : Nat -> Nat = \(n A f x) f (n A f x)
+
+let 1 : Nat = S 0
+
+let 2 : Nat = S 1
+
+let 3 : Nat = S 2
+
+let + : Nat -> Nat -> Nat =
+\(m n A f x) m A f (n A f x)
+
+let * : Nat -> Nat -> Nat =
+\(m n A f x) m A (n A f) x

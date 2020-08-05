@@ -22,7 +22,6 @@ let implode cl = String.concat "" (List.map (String.make 1) cl)
 let parse p s = 
   match p % s with
     | Some (t,[]) -> t
-    | Some (_,s) -> print_endline ("REST: "^implode s);raise ParseError
     | _ -> raise ParseError
 
 let parse' p s =

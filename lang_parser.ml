@@ -15,7 +15,8 @@ let symbol s = post (string s)
 let illegal_chr = ['\\';'(';')';':';' ';'\t';'\n';'%';'=']
 let ident = to_string @@ many1 (sat (fun x -> not (List.mem x illegal_chr)))
 
-let illegal_str = ["let";"->"]
+
+let illegal_str = ["let";"->"]  
 let variable = post (ident >>= (fun v -> if List.mem v illegal_str then fail else return v))
 
 let paren x = between (symbol "(") (symbol ")") x
@@ -28,7 +29,7 @@ let multi_bind c = List.fold_right (annotated_bind_fold c)
 
 
 let make sorts =
-
+  
   let rec expr i = chainr1 expr1 (symbol "->" *> return (fun t1 t2 -> PI (("",t1),t2))) i
     
       and expr1 i = chainl1 expr2 (return (fun m n -> APP (m,n))) i

@@ -1,3 +1,13 @@
 %SORTS Type | Kind
 %AXIOMS Type : Kind
 %RULES Type ~> Type | Kind ~> Type | Kind ~> Kind
+
+
+let List : Type -> Type = \(A : Type)\/(B : Type) (A -> B -> B) -> B -> B
+
+let [] : \/(A : Type) List A =
+\(_)\(_ g z) z
+
+let cons : \/(A : Type) A -> List A -> List A =
+\(_ x xs)\(B g z) g x (xs B g z)
+
