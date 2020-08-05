@@ -1,0 +1,6 @@
+
+%SORTS Type | Kind
+%AXIOMS Type : Kind
+%RULES Type ~> Type | Kind ~> Type
+
+

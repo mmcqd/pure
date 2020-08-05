@@ -1,0 +1,48 @@
+
+
+%SORTS Prop | Type
+%AXIOMS Prop : Type
+%RULES Prop ~> Prop | Prop ~> Type | Type ~> Prop | Type ~> Type
+
+
+let T = \/(A : Prop) A -> A
+
+let <> = \(A : Prop)(x : A) x
+
+let id = \(A : Prop)(x : A) x
+
+let F = \/(A : Prop) A
+
+let >>> = \(A B C : Prop)(f : A -> B)(g : B -> C)(x : A) g (f x) 
+
+let & = \(A B : Prop) \/(C : Prop) (A -> B -> C) -> C
+
+let pair = \(A B : Prop)(x : A)(y : B)(C : Prop)(e : A -> B -> C) e x y
+
+let fst = \(A B : Prop)(p : & A B) p A (\(x:A)(y:B) x)
+
+let snd = \(A B : Prop)(p : & A B) p B (\(x:A)(y:B) y)
+
+let curry = \(A B C : Prop)(f : & A B -> C)(x : A)(y : B) f (pair A B x y)
+
+let uncurry = \(A B C : Prop)(f : A -> B -> C)(p : & A B) f (fst A B p) (snd A B p)
+
+let Bin-Rel = \/(A : Prop) A -> A -> Prop
+let Refl  = \(R : Bin-Rel) \/(A : Prop)(x : A) R A x x
+let Sym   = \(R : Bin-Rel) \/(A : Prop)(x y : A) R A x y -> R A y x
+let Trans = \(R : Bin-Rel) \/(A : Prop)(x y z : A) R A x y -> R A y z -> R A x z
+
+let == = \(A : Prop)(x y : A) \/(P : A -> Prop) P x -> P y
+
+let eq-refl = \(A : Prop)(x : A)(P : A -> Prop) id (P x)
+
+let eq-sym = 
+  \(A : Prop)(x y : A)(eq : == A x y)(P : A -> Prop)
+    eq (\(z : A) P z -> P x) (id (P x))
+
+let eq-trans =
+  \(A : Prop)(x y z : A)(eq1 : == A x y)(eq2 : == A y z)(P : A -> Prop)
+    >>> (P x) (P y) (P z) (eq1 P) (eq2 P)
+
+
+

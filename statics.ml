@@ -5,12 +5,13 @@ open Dynamics
 exception TypeError of string
 
 let rec check_A s = function
-  | [] -> raise (TypeError "Unknown Sort")
+  | [] -> raise (TypeError ("The sort "^s^" has no type. Check axioms?"))
   | (s1,s2)::ss -> if s = s1 then SORT s2 else check_A s ss
 
 let check_S (s1,s2) r = 
   if List.mem (s1,s2) r then SORT s2 
-  else raise (TypeError ("Illegal Pi Type: "^s2^" cannot depend on "^s1))
+  else raise (TypeError 
+  ("Illegal Pi Type: value of type "^s2^" cannot depend on value of type "^s1))
 
 
 let synthtype (aa,ss) beta = 
