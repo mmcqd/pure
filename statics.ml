@@ -5,18 +5,18 @@ open Dynamics
 exception TypeError of string
 
 let rec check_A s = function
-  | [] -> raise (TypeError ("The sort "^s^" has no type. Check axioms?"))
+  | [] -> raise (TypeError ("The sort '"^s^"' has no type. Check axioms?"))
   | (s1,s2)::ss -> if s = s1 then SORT s2 else check_A s ss
 
 let check_S (s1,s2) r = 
   if List.mem (s1,s2) r then SORT s2 
   else raise (TypeError 
-  ("Illegal Pi Type: value of type "^s2^" cannot depend on value of type "^s1))
+  ("Illegal Pi Type: value of type '"^s2^"' cannot depend on value of type '"^s1^"'"))
 
 
 let synthtype (aa,ss) beta = 
   let rec synth g = function
-    | F x -> (try Context.find x g with _ -> raise (TypeError ("Unbound Variable: "^x)))
+    | F x -> (try Context.find x g with _ -> raise (TypeError ("Unbound Variable: '"^x^"'")))
     | B _ -> raise (Failure "Should never happen")
     | SORT s -> check_A s aa
     | ABS ((x,t),e) ->
@@ -42,6 +42,8 @@ let synthtype (aa,ss) beta =
           | (PI ((x,t),e),t') ->
               let (f,e') = unbind x e in 
               if alpha_eq (t,t') then subst f n e' 
-              else raise (TypeError ("Expected "^pretty t^" but got "^pretty t'))
+              else raise (TypeError 
+              ("Expected '"^pretty n^"' to have type '"^pretty t^"' but it has type '"^pretty t'^"' in expression: '"^pretty (APP (m,n))^"'"))
+          
           | _ -> raise (TypeError ("Operator is not a function, it cannot be applied"))
   in synth

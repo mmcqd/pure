@@ -7,4 +7,5 @@ module Make (P : COMBI.Parser.S) :
     val symbol : string -> string parser
     val variable : string parser
     val pre : 'a parser -> 'a parser
+    val post : 'a parser -> 'a parser
   end with type 'a m = 'a P.m
