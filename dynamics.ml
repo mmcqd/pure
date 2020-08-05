@@ -54,7 +54,7 @@ let rec binds y = function
   | F _ -> false
   | APP (m,n) -> binds y m || binds y n
   | ALAM ((_,t),e) | PI ((_,t),e) -> binds y t || binds (y+1) e
-  | LAM (_,e) -> bind (y+1) e
+  | LAM (_,e) -> binds (y+1) e
   | SORT _ -> false
   | ANNOT (e,t) -> binds y e || binds y t
 

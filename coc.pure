@@ -39,13 +39,11 @@ let curry = \(A B C : Prop)(f : & A B -> C)(x : A)(y : B) f (pair A B x y)
 let uncurry = \(A B C : Prop)(f : A -> B -> C)(p : & A B) f (fst A B p) (snd A B p)
 
 
-let Bin-Rel = \/(A : Prop) A -> A -> Prop
+let Refl  = \(R : \/(A:Prop) A -> A -> Prop) \/(A : Prop)(x : A) R A x x
 
-let Refl  = \(R : Bin-Rel) \/(A : Prop)(x : A) R A x x
+let Sym   = \(R : \/(A:Prop) A -> A -> Prop) \/(A : Prop)(x y : A) R A x y -> R A y x
 
-let Sym   = \(R : Bin-Rel) \/(A : Prop)(x y : A) R A x y -> R A y x
-
-let Trans = \(R : Bin-Rel) \/(A : Prop)(x y z : A) R A x y -> R A y z -> R A x z
+let Trans = \(R : \/(A:Prop) A -> A -> Prop) \/(A : Prop)(x y z : A) R A x y -> R A y z -> R A x z
 
 
 let == = \(A : Prop)(x y : A) \/(P : A -> Prop) P x -> P y

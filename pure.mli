@@ -3,9 +3,11 @@ type term =
   | F of string
   | B of int
   | APP of term * term
-  | ABS of (string * term) * term
+  | ALAM of (string * term) * term
+  | LAM of string * term
   | PI of (string * term) * term
   | SORT of string
+  | ANNOT of term * term
 
 val alpha_eq : term * term -> bool
 

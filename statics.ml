@@ -14,38 +14,53 @@ let check_S (s1,s2) r =
   ("Illegal Pi Type: value of type '"^s2^"' cannot depend on value of type '"^s1^"'"))
 
 
+let go = Fun.const ()
 
-let make (aa,ss) beta =
+let synthtype (aa,ss) beta =
   let rec synth g = function
         | SORT s -> check_A s aa
-        | F x -> match Context.find_opt x g with Some a -> synth g a; a | _ -> raise (TypeError "")
+        | F x -> 
+            begin
+            match Context.find_opt x g with 
+              | Some a -> go (try synth g a with TypeError s -> raise (TypeError (s^" Caused by: '"^pretty a^"'"))); a 
+              | _ -> raise (TypeError ("Unbound var: '"^x^"'"))
+            end
         | B _ -> raise (Failure "Should never be type checking a bound var")
         | ANNOT (e,t) -> check g (e,t)
         | PI ((x,t),e) -> 
             let (f,e') = unbind x e in
-            let s1 = synth g t in
-            let s2 = synth (g ++ (f,t)) e' in
-            check_S (s1,s2) ss; s2
-
+            begin
+            match beta @@ synth g t with
+              | SORT s1 ->
+                  begin
+                  match beta @@ synth (g ++ (f,t)) e' with
+                    | SORT s2 -> go @@ check_S (s1,s2) ss; SORT s2
+                    | x -> raise (TypeError ("'"^pretty x^"' must be a sort"))
+                    end
+              | x -> raise (TypeError ("'"^pretty x^"' must be a sort"))
+            end
         | APP (m,n) -> 
             begin
-            match synth g m with
-              | PI ((x,t),e) -> check g (n,t); subst x n e
-              | _ -> raise (TypeError "")
+            match beta @@ synth g m with
+              | PI ((x,t),e) -> let (f,e') = unbind x e in
+                                go @@ check g (n,t); subst f n e'
+              | t -> raise (TypeError ("'"^pretty m^"' has type '"^pretty t^"'. It is not a function, it cannot be applied"))
             end
         | ALAM ((x,t),e) ->
             let (f,e') = unbind x e in
             let b = synth (g ++ (f,t)) e' in
             let r = PI ((x,t),bind f b) in
-            synth g r; r
+            go @@ synth g r; r
 
-        | x -> raise (TypeError "Cannot infer type for: '"^x^"'"
+        | x -> raise (TypeError ("Cannot infer type for: '"^pretty x^"'"))
                               
 
       and check g = function
-        | LAM (x,e), (PI ((y,a),b) as t) -> check (g++(x,a)) b; synth g t; t
-        | m,b -> synth g b; let a = synth g m in if alpha_eq (beta a, beta b) then b else raise (TypeError "")
-  in (synth,check)
+        | LAM (x,e), (PI ((_,a),b) as t) -> let (f,e') = unbind x e in
+                                            go @@ check (g++(f,a)) (e',b); go @@ synth g t; t
+        | m,b -> go @@ synth g b; let a = synth g m in if alpha_eq (beta a, beta b) then b 
+                 else raise (TypeError ("'"^pretty a^"' does not equal '"^pretty b^"'"))
+  in synth
 
 (*
 let synthtype (aa,ss) beta = 

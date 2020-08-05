@@ -30,13 +30,13 @@ let make sorts =
     
       and expr1 i = chainl1 expr2 (return (fun m n -> APP (m,n))) i
 
-      and expr2 i = (sort <|> var <|> abs <|> pi <|> (fun i -> paren expr i)) i
+      and expr2 i = (sort <|> var <|> alam <|> pi <|> (fun i -> paren expr i)) i
 
       and sort i = ((fun s -> SORT s) <$> List.fold_right (<|>) (List.map symbol sorts) fail) i
     
       and var i = ((fun v -> F v) <$> variable) i
  
-      and abs i = (multi_bind (fun (x,e) -> ABS (x,e)) <$> 
+      and alam i = (multi_bind (fun (x,e) -> ALAM (x,e)) <$> 
                    (symbol "\\" *> many1 (paren args)) <*> 
                    expr) i
       
