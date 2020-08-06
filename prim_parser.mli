@@ -3,7 +3,7 @@ module type S =
   sig
     include COMBI.Parser.S
     exception ParseError
-    val pragmas : (string list * (string * string) list * (string * string) list) parser
+    val pragmas : (string list * (string * string) list * (string * string * string) list) parser
     val ignore : unit parser
     val paren : 'a parser -> 'a parser
     val pre : 'a parser -> 'a parser

@@ -10,11 +10,11 @@ let rec check_A s = function
   | [] -> raise (TypeError ("The sort '"^s^"' has no type. Check axioms?"))
   | (s1,s2)::ss -> if s = s1 then SORT s2 else check_A s ss
 
-let check_R (s1,s2) r = 
-  if List.mem (s1,s2) r then SORT s2 
-  else raise (TypeError 
-  ("Illegal Pi Type: value of type '"^s2^"' cannot depend on value of type '"^s1^"'"))
-
+let rec check_R (s1,s2) = function
+  | [] ->  
+      raise (TypeError 
+      ("Illegal Pi Type: value of type '"^s2^"' cannot depend on value of type '"^s1^"'"))
+  | (s1',s2',s3)::rs -> if s1 = s1' && s2 = s2' then SORT s3 else check_R (s1,s2) rs
 
 let (++) (g,d) kv = (g ++ kv,d)
 

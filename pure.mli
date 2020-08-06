@@ -21,5 +21,5 @@ module type THEORY =
   sig
     val sorts : string list
     val axioms : (string * string) list 
-    val rules : (string * string) list
+    val rules : (string * string * string) list
   end

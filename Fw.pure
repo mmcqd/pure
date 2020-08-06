@@ -1,6 +1,6 @@
 %SORTS Type | Kind
 %AXIOMS Type : Kind
-%RULES Type ~> Type | Kind ~> Type | Kind ~> Kind
+%RULES Type,Type,Type | Kind,Type,Type | Kind,Kind,Kind
 
 let T : Type = \/(A : Type) A -> A
 

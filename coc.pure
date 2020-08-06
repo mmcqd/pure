@@ -1,6 +1,6 @@
 %SORTS Prop | Type
 %AXIOMS Prop : Type
-%RULES Prop ~> Prop | Prop ~> Type | Type ~> Prop | Type ~> Type
+%RULES Prop,Prop,Prop | Prop,Type,Type | Type,Prop,Prop | Type,Type,Type
 
 
 let T : Prop = 

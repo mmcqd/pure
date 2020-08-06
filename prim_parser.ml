@@ -3,7 +3,7 @@ module type S =
   sig
     include COMBI.Parser.S
     exception ParseError
-    val pragmas : (string list * (string * string) list * (string * string) list) parser
+    val pragmas : (string list * (string * string) list * (string * string * string) list) parser
     val ignore : unit parser
     val paren : 'a parser -> 'a parser
     val pre : 'a parser -> 'a parser
@@ -27,7 +27,7 @@ let post p = p <* ignore
 
 let symbol s = post (string s)
 
-let illegal_chr = ['\\';'(';')';':';' ';'\t';'\n';'%';'=']
+let illegal_chr = ['\\';'(';')';':';' ';'\t';'\n';'%';'=';',']
 let illegal_str = ["let";"->"]  
 let variable = 
   post (ident illegal_chr >>= (fun v -> if List.mem v illegal_str then fail else return v))
@@ -42,8 +42,9 @@ let multi_bind c = List.fold_right (annotated_bind_fold c)
 
 
 let pair p s = (fun x y -> (x,y)) <$> (p <* s) <*> p
+let triple p s = (fun x y z -> (x,y,z)) <$> (p <* s) <*> (p <* s) <*> p
 let ax = pair variable (symbol ":")
-let rule = pair variable (symbol "~>")
+let rule = triple variable (symbol ",")
 let sorts = symbol "%SORTS" *> sepby1 variable (symbol "|")
 let axioms = symbol "%AXIOMS" *> sepby1 ax (symbol "|")
 let rules = symbol "%RULES" *> sepby1 rule (symbol "|")

@@ -1,6 +1,6 @@
 %SORTS Type | Kind
 %AXIOMS Type : Kind
-%RULES Type ~> Type | Kind ~> Type
+%RULES Type,Type,Type | Kind,Type,Type
 
 
 let Nat : Type = \/(A : Type) (A -> A) -> A -> A
