@@ -10,7 +10,7 @@ Pure uses bidirectional type checking, so it's typing rules are slightly differe
 
 Pure uses [Dune](https://github.com/ocaml/dune), which can be installed with `opam install dune`. 
 
-To build the interpreter, run `dune build repl.exe`, and run the resulting file at `_build/default/repl.exe` 
+To build the interpreter, run `dune build repl.exe`, and run the resulting file at `_build/default/repl.exe` with a `.pure` file as an argument.
 
 ## Using Pure
 
