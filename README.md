@@ -4,7 +4,8 @@ This is an interpreter for arbitrary pure type systems. Check [here](https://en.
 Pure uses bidirectional type checking, so it's typing rules are slightly different from the ones listed on wikipedia. Here are the typing rules, inspired by the recipe for bidirectionalization in the paper [Bidirectional Typechecking](https://arxiv.org/abs/1908.05839).
 
 ![Rules](https://i.imgur.com/k8fDES2.png)
-  
+ 
+I did not take these rules from Oleg Grenrus' blog post [here](https://oleg.fi/gists/posts/2020-08-03-bidi-pts.html), but we seem to have come up with pretty much the same thing. He goes somewhat deeper in exploring the idea than I do with Pure, however.
 
 ## Compiling
 
