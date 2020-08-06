@@ -21,3 +21,6 @@ let + : Nat -> Nat -> Nat =
 
 let * : Nat -> Nat -> Nat =
 \(m n A f x) m A (n A f) x
+
+
+

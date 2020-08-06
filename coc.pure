@@ -52,6 +52,38 @@ let curry : \/(A B C : Prop) (& A B -> C) -> A -> B -> C =
 let uncurry : \/(A B C : Prop) (A -> B -> C) -> & A B -> C =
  \(A B _ f p) f (fst A B p) (snd A B p)
 
+
+let Exists : \/(A : Prop) (A -> Prop) -> Prop =
+ \(A P) \/(B : Prop) (\/(x:A) P x -> B) -> B
+
+
+let List : Prop -> Prop = \(A)\/(B : Prop) (A -> B -> B) -> B -> B
+
+let [] : \/(A : Prop) List A =
+\(_)\(_ g z) z
+
+let cons : \/(A : Prop) A -> List A -> List A =
+\(_ x xs)\(B g z) g x (xs B g z)
+
+
+let Exists-Prop : (Prop -> Prop) -> Prop = 
+\(P) \/(B : Prop) (\/(t : Prop) P t -> B) -> B
+
+
+let Eq-Prop : Prop -> Prop -> Prop =
+\(A B) \/(P : Prop -> Prop) P A -> P B
+
+let eq-prop-refl : \/(A : Prop) Eq-Prop A A =
+\(A P) id (P A)
+
+let eq-prop-sym : \/(A B : Prop) Eq-Prop A B -> Eq-Prop B A =
+\(A B eq) eq (\(t) Eq-Prop t A) (eq-prop-refl A)
+
+let eq-prop-trans : \/(A B C : Prop) Eq-Prop A B -> Eq-Prop B C -> Eq-Prop A C =
+\(A B C eq1 eq2 P) >>> (P A) (P B) (P C) (eq1 P) (eq2 P)
+
+
+
 let Refl : (\/(A : Prop) A -> A -> Prop) -> Prop  =
  \(R) \/(A : Prop)(x : A) R A x x
 

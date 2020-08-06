@@ -1,4 +1,3 @@
-
 module Make (T : Pure.THEORY) =
 struct
 

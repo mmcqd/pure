@@ -83,7 +83,10 @@ let parse_theory f =
         in (theory,rest)
 
 
-let _ = 
+let _ =
+  if Array.length Sys.argv < 2 then
+  print_endline "Please provide file with SORTS, AXIOMS, RULES and optional definitions"
+  else 
   let file = Sys.argv.(1) in
   let (theory,txt) = parse_theory file in
   let module T = (val theory : Pure.THEORY) in

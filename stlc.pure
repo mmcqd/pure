@@ -1,0 +1,3 @@
+%SORTS <> | T | Type
+%AXIOMS <> : T | T : Type
+%RULES Type ~> Type

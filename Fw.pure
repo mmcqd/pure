@@ -2,6 +2,15 @@
 %AXIOMS Type : Kind
 %RULES Type ~> Type | Kind ~> Type | Kind ~> Kind
 
+let T : Type = \/(A : Type) A -> A
+
+let <> : T = \(_ x) x
+
+let id = <>
+
+let >>> : \/(A B C : Type) (A -> B) -> (B -> C) -> A -> C =
+ \(_ _ _ f g x) g (f x) 
+
 
 let List : Type -> Type = \(A : Type)\/(B : Type) (A -> B -> B) -> B -> B
 
@@ -11,3 +20,32 @@ let [] : \/(A : Type) List A =
 let cons : \/(A : Type) A -> List A -> List A =
 \(_ x xs)\(B g z) g x (xs B g z)
 
+
+let Exists : (Type -> Type) -> Type = 
+\(P : Type -> Type) \/(B : Type) (\/(t:Type) P t -> B) -> B
+
+
+let Eq : Type -> Type -> Type =
+\(A B) \/(P : Type -> Type) P A -> P B
+
+let eq-refl : \/(A : Type) Eq A A =
+\(A P) id (P A)
+
+let eq-sym : \/(A B : Type) Eq A B -> Eq B A =
+\(A B eq) eq (\(t) Eq t A) (eq-refl A)
+
+let eq-trans : \/(A B C : Type) Eq A B -> Eq B C -> Eq A C =
+\(A B C eq1 eq2 P) >>> (P A) (P B) (P C) (eq1 P) (eq2 P)
+
+
+let & : Type -> Type -> Type =
+ \(A B) \/(C : Type) (A -> B -> C) -> C
+
+let pair : \/(A B : Type) A -> B -> & A B = 
+ \(_ _ x y)\(_ e) e x y 
+
+let fst : \/(A B : Type) & A B -> A  =
+ \(A _ p) p A (\(x _) x)
+
+let snd : \/(A B : Type) & A B -> B = 
+ \(_ B p) p B (\(_ y) y)
