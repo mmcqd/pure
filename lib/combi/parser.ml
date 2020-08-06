@@ -34,6 +34,7 @@ sig
   val upper : char parser
   val digit : char parser
   val alphanum : char parser
+  val whitespace : char parser
   val char : char -> char parser
   val char_list : char list -> char list parser
   val string : string -> string parser
@@ -52,6 +53,7 @@ sig
   val postfix : 'a parser -> ('a -> 'a) parser -> 'a parser
   val prefix : ('a -> 'a) parser -> 'a parser -> 'a parser
   val consume : 'a parser -> unit parser
+  val ident : char list -> string parser
   val (%) : 'a parser -> string -> ('a * char list) m
 end
 
@@ -159,6 +161,8 @@ struct
   let letter = lower <|> upper
   let alphanum = letter <|> digit
 
+  let whitespace = sat (fun c -> c = ' ' || c = '\n' || c ='\t')
+
   let char c = sat (fun x -> x = c)
 
   let rec char_list = function
@@ -216,6 +220,8 @@ struct
 
   let prefix o p =
     lift2 (foldr (@@)) p (many o)
+
+  let ident illegal = to_string @@ many1 (sat (fun x -> not (List.mem x illegal)))
 
   let consume p = () <$ p
 

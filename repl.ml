@@ -1,33 +1,55 @@
-open Dynamics
-open Statics
-module DP = Directive_parser.Make (COMBI.Parser.Make (COMBI.Parser.OptionBase))
-open DP
-open LP
-open Pure
 
-exception ParseError
+module PP = Prim_parser.Make (COMBI.Parser.Make (COMBI.Parser.OptionBase))
+open PP
 
-let default_sorts = ["Prop";"Type"]
-let default_rules = ([("Prop","Type")],
-             [("Prop","Prop");("Type","Prop");("Type","Type");("Prop","Type")])
+module MkRepl (T : Pure.THEORY) =
+struct
+  open Statics.Make (T)
+  open Lang_parser.Make (PP) (T)
+  open Pure
 
-let (dir_parser,dec_parser,exp_parser) = DP.make default_sorts
+  let prgm = many dec
 
-(*
-let parse_opt p s = 
-   Option.map fst @@ List.find_opt (function (_,[]) -> true | _ -> false) (p % s)
-*)
-let implode cl = String.concat "" (List.map (String.make 1) cl)
+  let fold_decs = 
+    List.fold_left 
+    (fun (g,d) (x,e) ->
+      let e = bind_up e in
+      let t = synthtype (g,d) e in
+      let e' = beta d e in
+      print_endline (x ^ " : " ^ pretty t); 
+      print_string "\n";
+      (g++(x,t),d++(x,e'))
+    ) (Context.empty,Context.empty)
 
-let parse p s = 
-  match p % s with
-    | Some (t,[]) -> t
-    | _ -> raise ParseError
 
-let parse' p s =
-  match p s with
-    | Some (t,[]) -> t
-    | _ -> raise ParseError
+  let rec repl (g,d) =
+    try
+    print_string "-- ";
+    let s = Stdlib.read_line () in
+    if s = "" then repl (g,d) else
+    match parse cmd s with
+      | EXP e ->
+          begin
+          let e = bind_up e in
+          let t = synthtype (g,d) e in
+          let e' = beta d e in
+          print_endline ("_ : " ^ pretty t);
+          print_endline ("_ = " ^ pretty e');
+          print_string "\n";
+          repl (g,d)
+          end
+      | DEC (x,e) ->
+          let e = bind_up e in
+          let t = synthtype (g,d) e in
+          let e' = beta d e in
+          let (g',d') = (g++(x,t),d++(x,e')) in
+          print_endline (x ^" : " ^ pretty t);
+          print_endline (x ^ " = " ^ pretty e');
+          print_string "\n";
+          repl (g',d')
+    with | ParseError -> print_endline "Parse Error"; repl (g_dyn,g_stat)
+         | TypeError e -> print_endline ("Type Error: "^e); repl (g_dyn,g_stat)
+end
 
 
 let read_file f =
@@ -36,59 +58,33 @@ let read_file f =
   close_in ch;
   s
 
-let fold_decs rules = 
-  List.fold_left 
-  (fun (g_dyn,g_stat) (x,e) ->
-    let e = bind_up e in
-    let t = synthtype rules (beta g_dyn) g_stat e in
-    let e' = beta g_dyn e in
-    print_endline (x ^ " : " ^ pretty t);
-    print_string "\n";
-    (g_dyn++(x,e'),g_stat++(x,t))
-  ) (Context.empty,Context.empty)
-    
-let parse_file f =
+let parse p s =
+  match p % s with
+    | Some (t,[]) -> t
+    | _ -> raise ParseError
+
+let parse_theory f =
   let s = read_file f in
   match pragmas % s with
     | None -> raise (Failure "Missing SORTS, AXIOMS, or RULES")
-    | Some ((ss,ax,rs),t) ->
-      let (dir,dec,_) = DP.make ss in
-        let ds = parse' (many dec) t in
-        (fold_decs (ax,rs) ds, dir, (ax,rs))
+    | Some ((sorts,axioms,rules),rest) ->
+        let theory = 
+          (module struct 
+             let sorts = sorts
+             let axioms = axioms
+             let rules = rules
+           end : Pure.Theory)
+        in (theory,rest)
 
 
-let repl rules dir_parser =
-  let rec loop (g_dyn,g_stat) =
-    try
-    print_string "-- ";
-    let s = Stdlib.read_line () in
-    if s = "" then loop (g_dyn,g_stat) else
-    match parse dir_parser s with
-      | EXP e ->
-          begin
-          let e = bind_up e in
-          let t = synthtype rules (beta g_dyn) g_stat e in
-          let e' = beta g_dyn e in
-          print_endline ("_ : " ^ pretty t);
-          print_endline ("_ = " ^ pretty e');
-          print_string "\n";
-          loop (g_dyn,g_stat)
-          end
-      | DEC (x,e) ->
-          let e = bind_up e in
-          let t = synthtype rules (beta g_dyn) g_stat e in
-          let e' = beta g_dyn e in
-          let (g_dyn',g_stat') = (g_dyn++(x,e'),g_stat++(x,t)) in
-          print_endline (x ^" : " ^ pretty t);
-          print_endline (x ^ " = " ^ pretty e');
-          print_string "\n";
-          loop (g_dyn',g_stat')
-    with | ParseError -> print_endline "Parse Error"; loop (g_dyn,g_stat)
-         | TypeError e -> print_endline ("Type Error: "^e); loop (g_dyn,g_stat)
-  in loop
-  
-let _ = if Array.length Sys.argv > 1 then 
-        let file = Sys.argv.(1) in
-        let (gs, dir, rs) = parse_file file in
-        repl rs dir gs
-        else repl default_rules dir_parser (Context.empty, Context.empty)
+
+let file = Sys.argv.(1) in
+let (theory,txt) = parse_theory file in
+let module T = theory in
+let module Repl = MkRepl (T) in
+let ds = parse Repl.prgm txt in
+let (g,d) = Repl.fold_decs ds in
+Repl.repl (g,d)
+
+
+

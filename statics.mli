@@ -1,7 +1,7 @@
 
-exception TypeError of string
+module Make (T : Pure.THEORY) :
+  sig
+    exception TypeError of string
 
-val synthtype : (string * string) list * (string * string) list ->
-                (Pure.term -> Pure.term) ->
-                Pure.term Pure.Context.t -> Pure.term -> Pure.term
- 
+    val synthtype : Pure.term Pure.Context.t * Pure.Term Pure.Context.t -> Pure.term -> Pure.term
+  end

@@ -32,6 +32,7 @@ sig
   val upper : char parser
   val digit : char parser
   val alphanum : char parser
+  val whitespace : char parser
   val char : char -> char parser
   val char_list : char list -> char list parser
   val string : string -> string parser
@@ -50,6 +51,7 @@ sig
   val postfix : 'a parser -> ('a -> 'a) parser -> 'a parser
   val prefix : ('a -> 'a) parser -> 'a parser -> 'a parser
   val consume : 'a parser -> unit parser
+  val ident : char list -> string parser
   val (%) : 'a parser -> string -> ('a * char list) m
 end
 

@@ -15,6 +15,11 @@ module Context : Map.S with type key = string
 
 val (++) : 'a Context.t -> (string * 'a) -> 'a Context.t
 
-
 val to_string : term -> string
 
+module type THEORY = 
+  sig
+    val sorts : string list
+    val axioms : (string * string) list 
+    val rules : (string * string) list
+  end

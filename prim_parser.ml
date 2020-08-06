@@ -1,0 +1,38 @@
+
+module Make (P : COMBI.Parser.S) =
+struct
+
+include P
+
+exception ParseError
+let ignore = many whitespace
+let pre p = ignore *> p
+let post p = p <* ignore
+
+let symbol s = post (string s)
+
+let illegal_chr = ['\\';'(';')';':';' ';'\t';'\n';'%';'=']
+let ident = to_string @@ many1 (sat (fun x -> not (List.mem x illegal_chr)))
+
+let illegal_str = ["let";"->"]  
+let variable = post (ident >>= (fun v -> if List.mem v illegal_str then fail else return v))
+
+let paren x = between (symbol "(") (symbol ")") x
+
+let annotated_bind_fold c (xs,t) = List.fold_right (fun x e' -> c ((x,t),e')) xs
+
+let bind_fold c = List.fold_right (fun x e' -> c (x,e'))
+
+let multi_bind c = List.fold_right (annotated_bind_fold c)
+
+
+let pair p s = (fun x y -> (x,y)) <$> (p <* s) <*> p
+let ax = pair variable (symbol ":")
+let rule = pair variable (symbol "~>")
+let sorts = symbol "%SORTS" *> sepby1 variable (symbol "|")
+let axioms = symbol "%AXIOMS" *> sepby1 ax (symbol "|")
+let rules = symbol "%RULES" *> sepby1 rule (symbol "|")
+
+let pragmas = pre ((fun x y z -> (x,y,z)) <$> sorts <*> axioms <*> rules)
+
+end

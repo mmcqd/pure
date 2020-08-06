@@ -1,11 +1,13 @@
 
 
-module Make (P : COMBI.Parser.S) :
+module Make (P : COMBI.Parser.S) (T : Pure.THEORY) :
   sig
-    include COMBI.Parser.S
-    val make : string list -> (string * Pure.term) parser * Pure.term parser 
-    val symbol : string -> string parser
-    val variable : string parser
-    val pre : 'a parser -> 'a parser
-    val post : 'a parser -> 'a parser
+    type cmd =
+      | EXP of Pure.term
+      | DEC of string * Pure.term
+
+    val exp : Pure.term parser
+    val dec : (string * Pure.term) parser 
+    val cmd : cmd parser
+
   end with type 'a m = 'a P.m

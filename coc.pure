@@ -3,79 +3,113 @@
 %RULES Prop ~> Prop | Prop ~> Type | Type ~> Prop | Type ~> Type
 
 
-let T : Prop 
-= \/(A : Prop) A -> A
+let T : Prop = 
+\/(A : Prop) A -> A
 
-let <> : T 
-= \(_ x) x
+let <> : T  =
+ \(_ x) x
 
-let id : T 
-= <>
+let id : T  =
+ <>
 
-let F : Prop
-= \/(A : Prop) A
-
-
-let >>> : \/(A B C : Prop) (A -> B) -> (B -> C) -> A -> C 
-        = \(_ _ _ f g x) g (f x) 
+let F : Prop =
+ \/(A : Prop) A
 
 
-let & : Prop -> Prop -> Prop 
-= \(A B) \/(C : Prop) (A -> B -> C) -> C
-
-let pair : \/(A B : Prop) A -> B -> & A B
-= \(_ _ x y)\(_ e) e x y
-
-let fst : \/(A B : Prop) & A B -> A 
-= \(A _ p) p A (\(x _) x)
-
-let snd : \/(A B : Prop) & A B -> B
-= \(_ B p) p B (\(_ y) y)
+let >>> : \/(A B C : Prop) (A -> B) -> (B -> C) -> A -> C =
+ \(_ _ _ f g x) g (f x) 
 
 
-let + : Prop -> Prop -> Prop
-= \(A B) \/(C : Prop) (A -> C) -> (B -> C) -> C
+let & : Prop -> Prop -> Prop =
+ \(A B) \/(C : Prop) (A -> B -> C) -> C
 
-let inl : \/(A B : Prop) A -> + A B
-= \(_ _ x)\(_ e _) e x
+let pair : \/(A B : Prop) A -> B -> & A B =
+ \(_ _ x y)\(_ e) e x y
 
-let inr : \/(A B : Prop) B -> + A B
-= \(_ _ y)\(_ _ e) e y 
+let fst : \/(A B : Prop) & A B -> A  =
+ \(A _ p) p A (\(x _) x)
 
-let case : \/(A B C : Prop) + A B -> (A -> C) -> (B -> C) -> C
-= \(_ _ C s e1 e2) s C e1 e2
-
-
-let curry : \/(A B C : Prop) (& A B -> C) -> A -> B -> C
-= \(A B _ f x y) f (pair A B x y)
-
-let uncurry : \/(A B C : Prop) (A -> B -> C) -> & A B -> C
-= \(A B _ f p) f (fst A B p) (snd A B p)
-
-let Refl : (\/(A : Prop) A -> A -> Prop) -> Prop 
-= \(R) \/(A : Prop)(x : A) R A x x
-
-let Sym : (\/(A : Prop) A -> A -> Prop) -> Prop  
-= \(R) \/(A : Prop)(x y : A) R A x y -> R A y x
-
-let Trans : (\/(A : Prop) A -> A -> Prop) -> Prop 
-= \(R) \/(A : Prop)(x y z : A) R A x y -> R A y z -> R A x z
+let snd : \/(A B : Prop) & A B -> B =
+ \(_ B p) p B (\(_ y) y)
 
 
-let Eq : \/(A : Prop) A -> A -> Prop
-= \(A x y) \/(P : A -> Prop) P x -> P y
+let + : Prop -> Prop -> Prop =
+ \(A B) \/(C : Prop) (A -> C) -> (B -> C) -> C
 
-let eq-refl : Refl Eq
-= \(A x)\(P) id (P x)
+let inl : \/(A B : Prop) A -> + A B =
+ \(_ _ x)\(_ e _) e x
 
-let eq-sym : Sym Eq 
-= \(A x y eq)\(P) eq (\(z) P z -> P x) (eq-refl A x P)
+let inr : \/(A B : Prop) B -> + A B =
+ \(_ _ y)\(_ _ e) e y 
 
-let eq-trans : Trans Eq 
-= \(A x y z eq1 eq2)\(P) >>> (P x) (P y) (P z) (eq1 P) (eq2 P)
+let case : \/(A B : Prop) + A B -> \/(C : Prop) (A -> C) -> (B -> C) -> C =
+ \(_ _ s C e1 e2) s C e1 e2
 
 
+let curry : \/(A B C : Prop) (& A B -> C) -> A -> B -> C =
+ \(A B _ f x y) f (pair A B x y)
 
+let uncurry : \/(A B C : Prop) (A -> B -> C) -> & A B -> C =
+ \(A B _ f p) f (fst A B p) (snd A B p)
+
+let Refl : (\/(A : Prop) A -> A -> Prop) -> Prop  =
+ \(R) \/(A : Prop)(x : A) R A x x
+
+let Sym : (\/(A : Prop) A -> A -> Prop) -> Prop   =
+ \(R) \/(A : Prop)(x y : A) R A x y -> R A y x
+
+let Trans : (\/(A : Prop) A -> A -> Prop) -> Prop  =
+ \(R) \/(A : Prop)(x y z : A) R A x y -> R A y z -> R A x z
+
+
+let Eq : \/(A : Prop) A -> A -> Prop =
+ \(A x y) \/(P : A -> Prop) P x -> P y
+
+let eq-refl : Refl Eq =
+ \(A x)\(P) id (P x)
+
+let eq-sym : Sym Eq  =
+ \(A x y eq)\(P) eq (\(z) P z -> P x) (eq-refl A x P)
+
+let eq-trans : Trans Eq  =
+ \(A x y z eq1 eq2)\(P) >>> (P x) (P y) (P z) (eq1 P) (eq2 P)
+
+
+let Nat : Prop = \/(A : Prop) (A -> A) -> A -> A
+
+let 0 : Nat = \(A f x) x
+let Z : Nat = 0
+
+let S : Nat -> Nat = \(n A f x) f (n A f x)
+
+let 1 : Nat = S 0
+
+let 2 : Nat = S 1
+
+let 3 : Nat = S 2
+
+let add : Nat -> Nat -> Nat =
+\(m n A f x) m A f (n A f x)
+
+let mul : Nat -> Nat -> Nat =
+\(m n A f x) m A (n A f) x
+
+let 1+1is2 : Eq Nat 2 (add 1 1) = eq-refl Nat 2
+
+let Bool : Prop = + T T
+
+let true : Bool = inl T T <>
+
+let false : Bool = inr T T <>
+
+let if : Bool -> \/(R : Prop) R -> R -> R = 
+\(b R t f) case T T b R (\(_) t) (\(_) f)
+
+let if-true : \/(b : Bool)(R : Prop)(t f : R) Eq Bool true b -> Eq R t (if b R t f) =
+\(b R t f eq) eq (\(x) Eq R t (if x R t f)) (eq-refl R t)
+
+let if-false : \/(b : Bool)(R : Prop)(t f : R) Eq Bool false b -> Eq R f (if b R t f) =
+\(b R t f eq) eq (\(x) Eq R f (if x R t f)) (eq-refl R f)
 
 
 
