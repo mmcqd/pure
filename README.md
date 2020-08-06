@@ -1,10 +1,11 @@
 # Pure
 This is an interpreter for arbitrary pure type systems. Check [here](https://en.wikipedia.org/wiki/Pure_type_system) for a solid description.
 
-Pure uses bidirectional type checking, so it's typing rules are slightly different from the ones listed on wikipedia. Here are the typing rules:
+Pure uses bidirectional type checking, so it's typing rules are slightly different from the ones listed on wikipedia. Here are the typing rules, inspired by the recipe for bidirectionalization in the paper [Bidirectional Typechecking](https://arxiv.org/abs/1908.05839).
 
-![Rules](https://i.imgur.com/k8fDES2.png)
-  
+![Rules](https://i.imgur.com/Dz2MaEA.png)
+ 
+Oleg Grenrus has a [blog post](https://oleg.fi/gists/posts/2020-08-03-bidi-pts.html) on bidirectional type checking for pure type systems. I've only skimmed it, but we seem to have come up with pretty much the same set of rules. He goes somewhat deeper in exploring the idea than I do with Pure, however.
 
 ## Compiling
 
@@ -36,7 +37,7 @@ Notice how the type annotation on the declaration allows us to avoid giving name
 In annoted lambdas and in pi types, arguments with the same type can be conviniently grouped together. In unannotated lambdas, all arguments can be grouped together.
 Once a file has been read, you'll be presented with a REPL. Here you can evaluate expressions and make new top level bindings.
 
-Check out the `examples` folder for more... examples.
+Check out the `examples` folder for more... examples. In `coc.pure`, I prove that 1 + 1 = 2 :)
 
 ## Some Well Known Pure Type Systems
 ### Simply Typed Lambda Calculus, with the unit type
@@ -74,7 +75,7 @@ Check out the `examples` folder for more... examples.
 %RULES *,*,* | BOX,*,* | BOX,BOX,BOX | TRI,*,* | TRI,BOX,BOX
 ```
 
-I'll note that in all of these systems, the last two elements of each RULE triple are the same. The only type system off the top of my head where this is not the  case is one with an infinite heirachy of universes, but this is not expressible using Pure, since we'd need a RULE like `forall s1,s2. s1,s2,max(s1,s2)`).
+I'll note that in all of these systems, the last two elements of each RULE triple are the same. The only type system off the top of my head where this is not the  case is one with an infinite heirachy of universes, but this is not expressible using Pure, since we'd need a RULE like `forall s1,s2. s1,s2,max(s1,s2)`.
 
 
 
