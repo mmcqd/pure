@@ -31,7 +31,7 @@ let f : \/(A B : Type) (A -> A -> B) -> A -> A -> B = \(A B : Type)(f : A -> A -
 let g : \/(A B : Type) (A -> A -> B) -> A -> A -> B = \(_ _ f x y) f x y
 ```
 Lambda functions have optional type annotations on their arguments. If none are provided, Pure will try to infer the type of the function. 
-A function declared at the top level with no annotations on it's arguments cannot have it's type infered, so an annoation on the declaration becomes necessary.
+A function declared at the top level with no annotations on it's arguments cannot have it's type inferred, so an annoation on the declaration becomes necessary.
 Notice how the type annotation on the declaration allows us to avoid giving names to the the type parameters of the lambda.
 In annoted lambdas and in pi types, arguments with the same type can be conviniently grouped together. In unannotated lambdas, all arguments can be grouped together.
 Once a file has been read, you'll be presented with a REPL. Here you can evaluate expressions and make new top level bindings.
