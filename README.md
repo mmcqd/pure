@@ -8,7 +8,7 @@ Pure uses bidirectional type checking, so it's typing rules are slightly differe
 
 ## Compiling
 
-Pure uses [Dune](https://github.com/ocaml/dune), which can be install with `opam install dune`. 
+Pure uses [Dune](https://github.com/ocaml/dune), which can be installed with `opam install dune`. 
 
 To build the interpreter, run `dune build repl.exe`, and run the resulting file at `_build/default/repl.exe` 
 
