@@ -5,7 +5,7 @@ Pure uses bidirectional type checking, so it's typing rules are slightly differe
 
 ![Rules](https://i.imgur.com/k8fDES2.png)
  
-I did not take these rules from Oleg Grenrus' blog post [here](https://oleg.fi/gists/posts/2020-08-03-bidi-pts.html), but we seem to have come up with pretty much the same thing. He goes somewhat deeper in exploring the idea than I do with Pure, however.
+Oleg Grenrus has a blog post [here](https://oleg.fi/gists/posts/2020-08-03-bidi-pts.html) on bidirectional type checking for pure type systems. We seem to have come up with pretty much the same set of rules. He goes somewhat deeper in exploring the idea than I do with Pure, however.
 
 ## Compiling
 
