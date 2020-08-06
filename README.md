@@ -36,6 +36,8 @@ Notice how the type annotation on the declaration allows us to avoid giving name
 In annoted lambdas and in pi types, arguments with the same type can be conviniently grouped together. In unannotated lambdas, all arguments can be grouped together.
 Once a file has been read, you'll be presented with a REPL. Here you can evaluate expressions and make new top level bindings.
 
+Check out the `examples` folder for more... examples.
+
 ## Some Well Known Pure Type Systems
 ### Simply Typed Lambda Calculus, with the unit type
 ```
