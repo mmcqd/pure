@@ -2,13 +2,24 @@
 module PP = Prim_parser.Make (COMBI.Parser.Make (COMBI.Parser.OptionBase))
 open PP
 
+let parse p s =
+  match p % s with
+    | Some (t,[]) -> t
+    | _ -> raise ParseError
+
+let parse' p s =
+  match p s with
+    | Some (t,[]) -> t
+    | _ -> raise ParseError
+
 module MkRepl (T : Pure.THEORY) =
 struct
   open Statics.Make (T)
   open Lang_parser.Make (PP) (T)
   open Pure
+  open Dynamics
 
-  let prgm = many dec
+  let prgm = prgm
 
   let fold_decs = 
     List.fold_left 
@@ -47,8 +58,8 @@ struct
           print_endline (x ^ " = " ^ pretty e');
           print_string "\n";
           repl (g',d')
-    with | ParseError -> print_endline "Parse Error"; repl (g_dyn,g_stat)
-         | TypeError e -> print_endline ("Type Error: "^e); repl (g_dyn,g_stat)
+    with | ParseError -> print_endline "Parse Error"; repl (g,d)
+         | TypeError e -> print_endline ("Type Error: "^e); repl (g,d)
 end
 
 
@@ -57,11 +68,6 @@ let read_file f =
   let s = really_input_string ch (in_channel_length ch) in
   close_in ch;
   s
-
-let parse p s =
-  match p % s with
-    | Some (t,[]) -> t
-    | _ -> raise ParseError
 
 let parse_theory f =
   let s = read_file f in
@@ -73,18 +79,18 @@ let parse_theory f =
              let sorts = sorts
              let axioms = axioms
              let rules = rules
-           end : Pure.Theory)
+           end : Pure.THEORY)
         in (theory,rest)
 
 
-
-let file = Sys.argv.(1) in
-let (theory,txt) = parse_theory file in
-let module T = theory in
-let module Repl = MkRepl (T) in
-let ds = parse Repl.prgm txt in
-let (g,d) = Repl.fold_decs ds in
-Repl.repl (g,d)
+let _ = 
+  let file = Sys.argv.(1) in
+  let (theory,txt) = parse_theory file in
+  let module T = (val theory : Pure.THEORY) in
+  let module Repl = MkRepl (T) in
+  let ds = parse' Repl.prgm txt in
+  let (g,d) = Repl.fold_decs ds in
+  Repl.repl (g,d)
 
 
 

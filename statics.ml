@@ -59,7 +59,7 @@ let rec synth ((g,d) as c) = function
       | x -> raise (TypeError ("Cannot infer type for: '"^pretty x^"'"))
                             
 
-    and check c = function
+    and check ((_,d) as c) = function
       | LAM (x,e), (PI ((_,a),b) as t) -> let (f,e') = unbind x e in
                                           let b' = instantiate (F f) b in
                                           go @@ check (c++(f,a)) (e',b'); go @@ synth c t; t

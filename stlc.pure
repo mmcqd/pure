@@ -1,3 +1,0 @@
-%SORTS # | Type | Kind
-%AXIOMS # : Type | Type : Kind
-%RULES Type ~> Type

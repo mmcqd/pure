@@ -5,7 +5,6 @@ struct
 open Pure
 open P
 
-
 let rec expr i = chainr1 expr1 (symbol "->" *> return (fun t1 t2 -> PI (("",t1),t2))) i
   
     and expr1 i = chainl1 expr2 (return (fun m n -> APP (m,n))) i
@@ -46,6 +45,7 @@ let annot_dec i = ((fun x t e -> (x,ANNOT (e,t))) <$>
 
 let dec = pre (annot_dec <|> plain_dec)
 let exp = pre expr
+let prgm = many dec
 
 type cmd = 
   | EXP of term 

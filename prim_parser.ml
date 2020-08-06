@@ -1,21 +1,36 @@
 
+module type S = 
+  sig
+    include COMBI.Parser.S
+    exception ParseError
+    val pragmas : (string list * (string * string) list * (string * string) list) parser
+    val ignore : unit parser
+    val paren : 'a parser -> 'a parser
+    val pre : 'a parser -> 'a parser
+    val post : 'a parser -> 'a parser
+    val symbol : string -> string parser
+    val variable : string parser
+    val bind_fold : ('a * 'b -> 'b) -> 'a list -> 'b -> 'b
+    val annotated_bind_fold : (('a * 'b) * 'c -> 'c) -> 'a list * 'b -> 'c -> 'c
+    val multi_bind : (('a * 'b) * 'c -> 'c) -> ('a list * 'b) list -> 'c -> 'c 
+  end 
+
 module Make (P : COMBI.Parser.S) =
 struct
 
 include P
 
 exception ParseError
-let ignore = many whitespace
+let ignore = consume @@ many whitespace
 let pre p = ignore *> p
 let post p = p <* ignore
 
 let symbol s = post (string s)
 
 let illegal_chr = ['\\';'(';')';':';' ';'\t';'\n';'%';'=']
-let ident = to_string @@ many1 (sat (fun x -> not (List.mem x illegal_chr)))
-
 let illegal_str = ["let";"->"]  
-let variable = post (ident >>= (fun v -> if List.mem v illegal_str then fail else return v))
+let variable = 
+  post (ident illegal_chr >>= (fun v -> if List.mem v illegal_str then fail else return v))
 
 let paren x = between (symbol "(") (symbol ")") x
 

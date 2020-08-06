@@ -34,3 +34,9 @@ let rec to_string = function
   | SORT s -> "SORT "^s
   | ANNOT (e,t) -> "("^to_string e^" : "^to_string t^")"
  
+module type THEORY = 
+  sig
+    val sorts : string list
+    val axioms : (string * string) list 
+    val rules : (string * string) list
+  end
