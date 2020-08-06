@@ -27,7 +27,7 @@ These define the system that the rest of the file will be type checked against. 
 Declarations are in OCaml style, using `let` with an optional type annotation.
 ```
 let id = \(A : Type)(x : A) x
-let if : \/(A : Type) A -> A = \(A)\(x) x
+let id : \/(A : Type) A -> A = \(A)\(x) x
 let f : \/(A B : Type) (A -> A -> B) -> A -> A -> B = \(A B : Type)(f : A -> A -> B)(x y : A) f x y
 let g : \/(A B : Type) (A -> A -> B) -> A -> A -> B = \(_ _ f x y) f x y
 ```
