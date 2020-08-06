@@ -5,7 +5,6 @@ Pure uses bidirectional type checking, so it's typing rules are slightly differe
 
 ![Rules](https://i.imgur.com/ntdjEI9.png)
   
-The other major change is that the set of rules is no longer a set of triples, but of tuples. This is done because the second and third elements of each triple are the same in all type systems I'm familiar with.
 
 ## Compiling
 
@@ -15,12 +14,12 @@ To build the interpreter, run `dune build repl.exe`, and run the resulting file 
 
 ## Using Pure
 
-The top of every `.pure` file must contain 3 interpreter pragmas: `%SORTS`, `%AXIOMS`, and `%RULES`. We will use the System as an example:
+The top of every `.pure` file must contain 3 interpreter pragmas: `%SORTS`, `%AXIOMS`, and `%RULES`. To use System F as an example:
 
 ```
 %SORTS Type | Kind
 %AXIOMS Type : Kind
-%RULES Type,Type | Kind,Type
+%RULES Type,Type,Type | Kind,Type,Type
 ```
 These define the system that the rest of the file will be type checked against. The rest of the file can be zero or more declarations.
 
@@ -42,36 +41,38 @@ Once a file has been read, you'll be presented with a REPL. Here you can evaluat
 ```
 %SORTS <> | Unit | Type
 %AXIOMS <> : Unit | Unit : Type
-%RULES Type,Type
+%RULES Type,Type,Type
 ```
 
 ### System F
 ```
 %SORTS Type | Kind
 %AXIOMS Type : Kind
-%RULES Type,Type | Kind,Type
+%RULES Type,Type,Type | Kind,Type,Type
 ```
 
 ### System Fω
 ```
 %SORTS Type | Kind
 %AXIOMS Type : Kind
-%RULES Type,Type | Kind,Type | Kind,Kind
+%RULES Type,Type,Type | Kind,Type,Type | Kind,Kind,Kind
 ```
 
 ### Calculus of Constructions
 ```
 %SORTS Prop | Type
 %AXIOMS Prop : Type
-%RULES Prop,Prop | Prop,Type | Type,Prop | Type,Type
+%RULES Prop,Prop,Prop | Prop,Type,Type | Type,Prop,Prop | Type,Type,Type
 ```
 
 ### System U
 ```
 %SORTS * | BOX | TRI
 %AXIOMS * : BOX | BOX : TRI
-%RULES *,* | BOX,* | BOX,BOX | TRI,* | TRI,BOX
+%RULES *,*,* | BOX,*,* | BOX,BOX,BOX | TRI,*,* | TRI,BOX,BOX
 ```
+
+I'll note that in all of these systems, the last two elements of each RULE triple are the same. The only type system off the top of my head where this is not the case is one with an infinite heirachy of universes, but this is not expressible using Pure (we'd need something like "forall s1,s2. s1,s2,max(s1,s2)").
 
 
 
