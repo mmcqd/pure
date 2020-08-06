@@ -1,5 +1,5 @@
 # pure
-This is an interpreter for arbitary pure type systems. Check [here](https://en.wikipedia.org/wiki/Pure_type_system) for a solid description.
+This is an interpreter for arbitrary pure type systems. Check [here](https://en.wikipedia.org/wiki/Pure_type_system) for a solid description.
 
 Pure uses bidirectional type checking, so it's typing rules are slightly different from the ones listed on wikipedia. Here are the typing rules:
 
