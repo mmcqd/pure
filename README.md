@@ -1,7 +1,7 @@
 # Pure
 This is an interpreter for arbitrary pure type systems. Check [here](https://en.wikipedia.org/wiki/Pure_type_system) for a solid description.
 
-Pure uses bidirectional type checking, so it's typing rules are slightly different from the ones listed on wikipedia. Here are the typing rules, inspired by the recipe for bidirectionalization the paper [Bidirectional Typechecking](https://arxiv.org/abs/1908.05839).
+Pure uses bidirectional type checking, so it's typing rules are slightly different from the ones listed on wikipedia. Here are the typing rules, inspired by the recipe for bidirectionalization in the paper [Bidirectional Typechecking](https://arxiv.org/abs/1908.05839).
 
 ![Rules](https://i.imgur.com/k8fDES2.png)
   
