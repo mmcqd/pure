@@ -16,7 +16,9 @@ let rec alpha_eq = function
   | APP (m,n), APP (m',n') -> alpha_eq (m,m') && alpha_eq (n,n')
   | SORT s, SORT s' -> s = s'
   | ALAM ((_,t),e), ALAM ((_,t'),e') -> alpha_eq (t,t') && alpha_eq (e,e')
-  | LAM (_,e), LAM (_,e') -> alpha_eq (e,e')
+  | LAM (_,e), LAM (_,e') 
+  | ALAM (_,e), LAM (_,e')
+  | LAM (_,e), ALAM (_,e') -> alpha_eq (e,e')
   | PI ((_,t),e), PI ((_,t'),e') -> alpha_eq (t,t') && alpha_eq (e,e')
   | ANNOT (e,t), ANNOT (e',t') -> alpha_eq (e,e') && alpha_eq (t,t')
   | _ -> false
