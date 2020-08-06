@@ -84,7 +84,10 @@ let pretty s = reset_var_stream ();
           | (ALAM _,_) | (LAM _ , _ ) | (PI _, _) -> paren (pretty m)^" "^pretty n
           | _ -> pretty m^" "^pretty n
         end
-    | LAM (x,e) | ALAM ((x,_),e) -> 
+    | ALAM ((x,t),e) -> 
+        let x' = if free_in x e then fresh x else x in
+        "\\("^x'^":"^pretty t^") "^pretty (instantiate (F x') e)
+    | LAM (x,e) -> 
         let x' = if free_in x e then fresh x else x in
         "\\("^x'^") "^pretty (instantiate (F x') e)
     | PI  ((x,t),e) ->
