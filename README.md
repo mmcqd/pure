@@ -3,7 +3,7 @@ This is an interpreter for arbitrary pure type systems. Check [here](https://en.
 
 Pure uses bidirectional type checking, so it's typing rules are slightly different from the ones listed on wikipedia. Here are the typing rules:
 
-![Rules](https://i.imgur.com/ntdjEI9.png)
+![Rules](https://i.imgur.com/k8fDES2.png)
   
 
 ## Compiling
