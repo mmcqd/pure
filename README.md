@@ -72,7 +72,7 @@ Once a file has been read, you'll be presented with a REPL. Here you can evaluat
 %RULES *,*,* | BOX,*,* | BOX,BOX,BOX | TRI,*,* | TRI,BOX,BOX
 ```
 
-I'll note that in all of these systems, the last two elements of each RULE triple are the same. The only type system off the top of my head where this is not the case is one with an infinite heirachy of universes, but this is not expressible using Pure (we'd need something like "forall s1,s2. s1,s2,max(s1,s2)").
+I'll note that in all of these systems, the last two elements of each RULE triple are the same. The only type system off the top of my head where this is not the case is one with an infinite heirachy of universes, but this is not expressible using Pure (we'd need something like `forall s1,s2. s1,s2,max(s1,s2)`).
 
 
 
