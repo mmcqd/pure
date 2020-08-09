@@ -53,8 +53,14 @@ let uncurry : \/(A B C : Prop) (A -> B -> C) -> & A B -> C =
  \(A B _ f p) f (fst A B p) (snd A B p)
 
 
-let Exists : \/(A : Prop) (A -> Prop) -> Prop =
+let Sigma : \/(A : Prop) (A -> Prop) -> Prop =
  \(A P) \/(B : Prop) (\/(x:A) P x -> B) -> B
+
+let Exists = Sigma
+
+let dFst : \/(A : Prop)(P : A -> Prop) Sigma A P -> A =
+\(A _ s) s A (\(x _) x)
+
 
 
 let List : Prop -> Prop = \(A)\/(B : Prop) (A -> B -> B) -> B -> B
@@ -126,6 +132,8 @@ let add : Nat -> Nat -> Nat =
 let mul : Nat -> Nat -> Nat =
 \(m n A f x) m A (n A f) x
 
+
+
 let 1+1is2 : Eq Nat 2 (add 1 1) = eq-refl Nat 2
 
 let Bool : Prop = + T T
@@ -137,11 +145,25 @@ let false : Bool = inr T T <>
 let if : Bool -> \/(R : Prop) R -> R -> R = 
 \(b R t f) case T T b R (\(_) t) (\(_) f)
 
-let if-true : \/(b : Bool)(R : Prop)(t f : R) Eq Bool true b -> Eq R t (if b R t f) =
+
+let if-spec-true : Prop =
+\/(b : Bool)(R : Prop)(t f : R) Eq Bool true b -> Eq R t (if b R t f) 
+
+let if-spec-false : Prop =
+\/(b : Bool)(R : Prop)(t f : R) Eq Bool false b -> Eq R f (if b R t f) 
+
+let if-spec : Prop =
+& if-spec-true if-spec-false
+
+
+let if-true : if-spec-true =
 \(b R t f eq) eq (\(x) Eq R t (if x R t f)) (eq-refl R t)
 
-let if-false : \/(b : Bool)(R : Prop)(t f : R) Eq Bool false b -> Eq R f (if b R t f) =
+let if-false : if-spec-false =
 \(b R t f eq) eq (\(x) Eq R f (if x R t f)) (eq-refl R f)
 
+let if-correct : if-spec = pair if-spec-true if-spec-false if-true if-false
+
+let id-correct : \/(A : Prop)(x : A) Eq A x (id A x) = eq-refl
 
 

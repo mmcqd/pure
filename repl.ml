@@ -14,7 +14,8 @@ let parse' p s =
 
 module MkRepl (T : Pure.THEORY) =
 struct
-  open Statics.Make (T)
+  module S = Statics.Make (T)
+  open S
   open Lang_parser.Make (PP) (T)
   open Pure
   open Dynamics
@@ -91,9 +92,11 @@ let _ =
   let (theory,txt) = parse_theory file in
   let module T = (val theory : Pure.THEORY) in
   let module Repl = MkRepl (T) in
+  try
   let ds = parse' Repl.prgm txt in
   let (g,d) = Repl.fold_decs ds in
   Repl.repl (g,d)
+  with | Repl.S.TypeError s -> print_endline ("Type Error: "^s)
 
 
 

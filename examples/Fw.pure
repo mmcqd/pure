@@ -49,3 +49,16 @@ let fst : \/(A B : Type) & A B -> A  =
 
 let snd : \/(A B : Type) & A B -> B = 
  \(_ B p) p B (\(_ y) y)
+
+
+
+
+
+
+
+
+
+
+
+
+

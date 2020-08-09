@@ -1,0 +1,29 @@
+%SORTS Type | Kind | Sort
+%AXIOMS Type : Kind | Kind : Sort
+%RULES Type,Type,Type | Kind,Type,Type | Kind,Kind,Kind | Sort,Sort,Sort | Sort,Kind,Kind
+
+
+let && : Kind -> Kind -> Kind =
+\(A B) \/(C : Kind) (A -> B -> C) -> C
+
+let tPair : \/(A B : Kind) A -> B -> && A B =
+\(_ _ x y)\(_ e) e x y
+
+let tFst : \/(A B : Kind) && A B -> A  =
+ \(A _ p) p A (\(x _) x)
+
+let tSnd : \/(A B : Kind) && A B -> B = 
+ \(_ B p) p B (\(_ y) y)
+
+
+let & : Type -> Type -> Type =
+ \(A B) \/(C : Type) (A -> B -> C) -> C
+
+let pair : \/(A B : Type) A -> B -> & A B = 
+ \(_ _ x y)\(_ e) e x y 
+
+let fst : \/(A B : Type) & A B -> A  =
+ \(A _ p) p A (\(x _) x)
+
+let snd : \/(A B : Type) & A B -> B = 
+ \(_ B p) p B (\(_ y) y)
