@@ -1,0 +1,93 @@
+%SORTS
+  Prop
+| Type
+%AXIOMS
+  Prop : Type
+%RULES
+  Prop,Prop,Prop
+| Prop,Type,Type
+| Type,Prop,Prop
+| Type,Type,Type
+
+let ⊤ : Prop = ∀ (A : Prop) A → A
+let tt : ⊤ = λ(_ x) x
+
+let ⊥ : Prop = ∀ (A : Prop) A
+
+
+let ∧ : Prop → Prop → Prop =
+λ(A B) ∀ (C : Prop) (A → B → C) → C
+
+let pair : ∀ (A B : Prop) A → B → ∧ A B =
+λ(_ _ x y) λ(_ elim) elim x y
+
+let π₁ : ∀ (A B : Prop) ∧ A B → A =
+λ(A B p) p A (λ(x y) x)
+
+let π₂ : ∀ (A B : Prop) ∧ A B → B =
+λ(A B p) p B (λ(x y) y)
+
+
+let ∨ : Prop → Prop → Prop =
+λ(A B) ∀ (C : Prop) (A → C) → (B → C) → C
+
+let inj₁ : ∀ (A B : Prop) A → ∨ A B =
+λ(_ _ a _ l r) l a
+
+let inj₂ : ∀ (A B : Prop) B → ∨ A B =
+λ(_ _ b _ l r) r b
+
+let case : ∀ (A B : Prop) ∨ A B → ∀ (C : Prop) (A → C) → (B → C) → C =
+λ(_ _ x) x
+
+
+let ≡ : ∀ (A : Prop) A → A → Prop =
+λ(A x y) ∀ (P : A → Prop) P x → P y
+
+let refl : ∀ (A : Prop) (x : A) ≡ A x x =
+λ(_ _ _ Px) Px
+
+let sym : ∀ (A : Prop) (x y : A) ≡ A x y → ≡ A y x =
+λ(A x y x≡y P) x≡y (λ(w) P w → P x) (refl A x P)
+
+let trans : ∀ (A : Prop) (x y z : A) ≡ A x y → ≡ A y z → ≡ A x z =
+λ(A x y z x≡y y≡z P Px) y≡z P (x≡y P Px)
+
+
+let 𝔹 : Prop = ∨ ⊤ ⊤
+let true  : 𝔹 = inj₁ ⊤ ⊤ tt
+let false : 𝔹 = inj₂ ⊤ ⊤ tt
+
+let if : 𝔹 → ∀(A : Prop) A → A → A =
+λ(b A t f) case ⊤ ⊤ b A (λ(_) t) (λ(_) f)
+
+let ℕ : Prop = ∀ (A : Prop) (A → A) → A → A
+let Z : ℕ = λ(_ _ x) x
+let S : ℕ → ℕ = λ(n A f x) f (n A f x)
+let 0 : ℕ = Z
+let 1 : ℕ = S 0
+let 2 : ℕ = S 1
+let 3 : ℕ = S 2
+let 4 : ℕ = S 3
+let 5 : ℕ = S 4
+let 6 : ℕ = S 5
+let 7 : ℕ = S 6
+let 8 : ℕ = S 7
+let 9 : ℕ = S 8
+
+let ℕ-elim : ℕ → ∀ (A : Prop) (A → A) → A → A = λ(x) x
+
+let + : ℕ → ℕ → ℕ =
+λ(m n) ℕ-elim m ℕ S n
+
+let * : ℕ → ℕ → ℕ =
+λ(m n) ℕ-elim m ℕ (+ n) 0
+
+let ^ : ℕ → ℕ → ℕ =
+λ(m n) ℕ-elim n ℕ (* m) 1
+
+let 1+1≡2 : ≡ ℕ (+ 1 1) 2 = refl ℕ 2
+
+let 2*3≡6 : ≡ ℕ (* 2 3) 6 = refl ℕ 6
+
+let 3^2≡9 : ≡ ℕ (^ 3 2) 9 = refl ℕ 9

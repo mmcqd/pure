@@ -100,7 +100,10 @@ struct
   let foldr f z xs = List.fold_right f xs z
   let foldl = List.fold_left
   let explode s = List.init (String.length s) (String.get s)
-  let implode = foldr (fun x y -> Char.escaped x ^ y) ""
+  let implode chars = 
+    let buf = Buffer.create 16 in
+    List.iter (Buffer.add_char buf) chars;
+    Buffer.contents buf
 
   let return x i = M.return (x,i)
 

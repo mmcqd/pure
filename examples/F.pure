@@ -2,10 +2,13 @@
 %AXIOMS Type : Kind
 %RULES Type,Type,Type | Kind,Type,Type
 
-
 let Nat : Type = \/(A : Type) (A -> A) -> A -> A
 
-let 0 : Nat = \(A f x) x
+let Nat-elim : Nat -> \/(A : Type) (A -> A) -> A -> A =
+\(x) x
+
+let 0 : Nat = \(_ f x) x
+
 let Z : Nat = 0
 
 let S : Nat -> Nat = \(n A f x) f (n A f x)
@@ -20,7 +23,7 @@ let + : Nat -> Nat -> Nat =
 \(m n A f x) m A f (n A f x)
 
 let * : Nat -> Nat -> Nat =
-\(m n A f x) m A (n A f) x
+\(m n) Nat-elim m Nat (+ n) 0
 
-
-
+let ^ : Nat -> Nat -> Nat =
+\(m n) Nat-elim n Nat (* m) 1

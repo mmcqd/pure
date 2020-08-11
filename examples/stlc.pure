@@ -1,3 +1,8 @@
-%SORTS <> | Unit | Type
-%AXIOMS <> : Unit | Unit : Type
+%SORTS <> | Unit | Void | Type
+%AXIOMS <> : Unit | Unit : Type | Void : Type | Type : Type
 %RULES Type,Type,Type
+
+let id-unit : Unit -> Unit = \(x) x
+
+let id-void : Void -> Void = \(x) x
+

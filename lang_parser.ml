@@ -5,7 +5,11 @@ struct
 open Pure
 open P
 
-let rec expr i = chainr1 expr1 (symbol "->" *> return (fun t1 t2 -> PI (("",t1),t2))) i
+let arrow = symbol "->" <|> symbol "→" 
+let forall = symbol "\\/" <|> symbol "∀"
+let lambda = symbol "\\" <|> symbol "λ"
+
+let rec expr i = chainr1 expr1 (arrow *> return (fun t1 t2 -> PI (("",t1),t2))) i
   
     and expr1 i = chainl1 expr2 (return (fun m n -> APP (m,n))) i
 
@@ -22,18 +26,18 @@ let rec expr i = chainr1 expr1 (symbol "->" *> return (fun t1 t2 -> PI (("",t1),
     and var i = ((fun v -> F v) <$> variable) i
 
     and lam i = (bind_fold (fun (x,e) -> LAM (x,e)) <$>
-                symbol "\\" *> 
+                lambda *> 
                 paren (many1 variable) <*>
                 expr) i
 
     and alam i = (multi_bind (fun (x,e) -> ALAM (x,e)) <$> 
-                 symbol "\\" *> 
+                 lambda *> 
                  many1 (paren args) <*> 
                  expr) i
     
 
     and pi i = (multi_bind (fun (x,e) -> PI (x,e)) <$> 
-               symbol "\\/" *>
+               forall *>
                many1 (paren args) <*>
                expr) i
      

@@ -115,26 +115,37 @@ let eq-trans : Trans Eq  =
 
 let Nat : Prop = \/(A : Prop) (A -> A) -> A -> A
 
+let Nat-elim : Nat -> \/(A : Prop) (A -> A) -> A -> A =
+\(x) x
+
 let 0 : Nat = \(A f x) x
+
 let Z : Nat = 0
 
 let S : Nat -> Nat = \(n A f x) f (n A f x)
 
 let 1 : Nat = S 0
-
 let 2 : Nat = S 1
-
 let 3 : Nat = S 2
+let 4 : Nat = S 3
+let 5 : Nat = S 4
+let 6 : Nat = S 5
+let 7 : Nat = S 6
+let 8 : Nat = S 7
+let 9 : Nat = S 8
 
 let add : Nat -> Nat -> Nat =
 \(m n A f x) m A f (n A f x)
 
 let mul : Nat -> Nat -> Nat =
-\(m n A f x) m A (n A f) x
+\(m n) Nat-elim m Nat (add n) 0
 
+let exp : Nat -> Nat -> Nat =
+\(m n) Nat-elim n Nat (mul m) 1
 
+let 1+1-is-2 : Eq Nat (add 1 1) 2 = eq-refl Nat 2
 
-let 1+1is2 : Eq Nat 2 (add 1 1) = eq-refl Nat 2
+let 2*3-is-6 : Eq Nat (mul 2 3) 6 = eq-refl Nat 6
 
 let Bool : Prop = + T T
 

@@ -1,4 +1,3 @@
-
 module type S = 
   sig
     include COMBI.Parser.S
@@ -28,9 +27,9 @@ let post p = p <* ignore
 let symbol s = post (string s)
 
 let illegal_chr = ['\\';'(';')';' ';'\t';'\n';'%';',';':';'=']
-let illegal_str = ["let";"->"]  
+let illegal_str = ["let";"->";"→";"∀";"λ"]  
 let variable = 
-  post (ident illegal_chr >>= (fun v -> if List.mem v illegal_str then fail else return v))
+  post (let* v = ident illegal_chr in if List.mem v illegal_str then fail else return v)
 
 let paren x = between (symbol "(") (symbol ")") x
 
