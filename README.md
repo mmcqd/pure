@@ -74,9 +74,9 @@ Check out the `examples` folder for more... examples. In `coc.pure`, I prove tha
 
 ### System U
 ```
-%SORTS * | BOX | TRI
-%AXIOMS * : BOX | BOX : TRI
-%RULES *,*,* | BOX,*,* | BOX,BOX,BOX | TRI,*,* | TRI,BOX,BOX
+%SORTS * | □ | Δ
+%AXIOMS * : □ | □ : Δ
+%RULES *,*,* | □,*,* | □,□,□ | Δ,*,* | Δ,□,□
 ```
 
 I'll note that in all of these systems, the last two elements of each RULE triple are the same. The only type system off the top of my head where this is not the  case is one with an infinite heirachy of universes, but this is not expressible using Pure, since we'd need a RULE like `forall s1,s2. s1,s2,max(s1,s2)`.
