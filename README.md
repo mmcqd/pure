@@ -24,7 +24,9 @@ The top of every `.pure` file must contain 3 interpreter pragmas: `%SORTS`, `%AX
 ```
 These define the system that the rest of the file will be type checked against. The rest of the file can be zero or more declarations.
 
-Declarations are in OCaml style, using `let` with an optional type annotation. Use of unicode characters in names and as alternatives to `\/`,`->`,and `\` is supported.
+Declarations are in OCaml style, using `let` with an optional type annotation.
+
+Use of unicode characters in names and as alternatives to `\/`,`->`,and `\` is supported.
 ```
 let id = \(A : Type)(x : A) x
 let id : \/(A : Type) A -> A = \(A)\(x) x
