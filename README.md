@@ -24,12 +24,14 @@ The top of every `.pure` file must contain 3 interpreter pragmas: `%SORTS`, `%AX
 ```
 These define the system that the rest of the file will be type checked against. The rest of the file can be zero or more declarations.
 
-Declarations are in OCaml style, using `let` with an optional type annotation.
+Declarations are in OCaml style, using `let` with an optional type annotation. Use of unicode characters in names and as alternatives to "\/","->",and "\" is supported.
 ```
 let id = \(A : Type)(x : A) x
 let id : \/(A : Type) A -> A = \(A)\(x) x
 let f : \/(A B : Type) (A -> A -> B) -> A -> A -> B = \(A B : Type)(f : A -> A -> B)(x y : A) f x y
 let g : \/(A B : Type) (A -> A -> B) -> A -> A -> B = \(_ _ f x y) f x y
+let ℕ : Prop = ∀ (A : Prop) (A → A) → A → A
+let Z : ℕ = λ(_ _ x) x 
 ```
 Lambda functions have optional type annotations on their arguments. If none are provided, Pure will try to infer the type of the function. 
 A function declared at the top level with no annotations on it's arguments cannot have it's type inferred, so an annoation on the declaration becomes necessary.
