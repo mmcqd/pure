@@ -3,7 +3,7 @@ This is an interpreter for arbitrary pure type systems. Check [here](https://en.
 
 Pure uses bidirectional type checking, so it's typing rules are slightly different from the ones listed on wikipedia. Here are the typing rules, inspired by the recipe for bidirectionalization in the paper [Bidirectional Typechecking](https://arxiv.org/abs/1908.05839).
 
-![Rules](https://i.imgur.com/Dz2MaEA.png)
+![Rules](https://i.imgur.com/je1Cumj.png)
  
 Oleg Grenrus has a [blog post](https://oleg.fi/gists/posts/2020-08-03-bidi-pts.html) on bidirectional type checking for pure type systems. I've only skimmed it, but we seem to have come up with pretty much the same set of rules. He goes somewhat deeper in exploring the idea than I do with Pure, however.
 
