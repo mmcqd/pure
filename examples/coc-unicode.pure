@@ -9,11 +9,16 @@
 | Type,Prop,Prop
 | Type,Type,Type
 
+
 let ⊤ : Prop = ∀ (A : Prop) A → A
+let 𝟙 = ⊤
 let tt : ⊤ = λ(_ x) x
+let id = tt
 
 let ⊥ : Prop = ∀ (A : Prop) A
+let ⊥-elim : ⊥ → ∀ (A : Prop) A = λ(f) f
 
+let ¬ : Prop → Prop = λ(p) p → ⊥
 
 let ∧ : Prop → Prop → Prop =
 λ(A B) ∀ (C : Prop) (A → B → C) → C
@@ -41,6 +46,12 @@ let case : ∀ (A B : Prop) ∨ A B → ∀ (C : Prop) (A → C) → (B → C) �
 λ(_ _ x) x
 
 
+let Σ : ∀ (A : Prop) (A → Prop) → Prop =
+λ(A P) ∀ (C : Prop) (∀ (x : A) P x → C) → C
+
+let exists : ∀ (A : Prop) (P : A → Prop) (x : A) P x → Σ A P =
+λ(_ _ x p _ elim) elim x p
+
 let ≡ : ∀ (A : Prop) A → A → Prop =
 λ(A x y) ∀ (P : A → Prop) P x → P y
 
@@ -53,13 +64,34 @@ let sym : ∀ (A : Prop) (x y : A) ≡ A x y → ≡ A y x =
 let trans : ∀ (A : Prop) (x y z : A) ≡ A x y → ≡ A y z → ≡ A x z =
 λ(A x y z x≡y y≡z P Px) y≡z P (x≡y P Px)
 
+let ≃ : Prop → Prop → Prop =
+λ(A B)
+  Σ (A → B) λ(a→b)
+  Σ (B → A) λ(b→a)
+  ∧ (∀ (a : A) ≡ A (b→a (a→b a)) a) (∀ (b : B) ≡ B (a→b (b→a b)) b)  
+
+let ⇔ : Prop → Prop → Prop =
+λ(A B) ∧ (A → B) (B → A)
 
 let 𝔹 : Prop = ∨ ⊤ ⊤
 let true  : 𝔹 = inj₁ ⊤ ⊤ tt
 let false : 𝔹 = inj₂ ⊤ ⊤ tt
 
-let if : 𝔹 → ∀(A : Prop) A → A → A =
+let if : 𝔹 → ∀ (A : Prop) A → A → A =
 λ(b A t f) case ⊤ ⊤ b A (λ(_) t) (λ(_) f)
+
+let 𝔹 : Prop = ∀ (A : Prop) A → A → A
+let true  : 𝔹 = λ(_ x y) x
+let false : 𝔹 = λ(_ x y) y
+
+let if : 𝔹 → ∀ (A : Prop) A → A → A =
+λ(x) x
+
+let && : 𝔹 → 𝔹 → 𝔹 =
+λ(b1 b2) if b1 𝔹 (if b2 𝔹 true false) false
+
+let || : 𝔹 → 𝔹 → 𝔹 =
+λ(b1 b2) if b1 𝔹 true (if b2 𝔹 true false)
 
 let ℕ : Prop = ∀ (A : Prop) (A → A) → A → A
 let Z : ℕ = λ(_ _ x) x
@@ -77,8 +109,17 @@ let 9 : ℕ = S 8
 
 let ℕ-elim : ℕ → ∀ (A : Prop) (A → A) → A → A = λ(x) x
 
+let pred : ℕ → ℕ =
+λ(n) π₁ ℕ ℕ
+     (ℕ-elim n (∧ ℕ ℕ)
+       (λ(p) pair ℕ ℕ (π₂ ℕ ℕ p) (S (π₂ ℕ ℕ p)))
+       (pair ℕ ℕ 0 0))
+
 let + : ℕ → ℕ → ℕ =
 λ(m n) ℕ-elim m ℕ S n
+
+let - : ℕ → ℕ → ℕ =
+λ(m n) ℕ-elim n ℕ pred m
 
 let * : ℕ → ℕ → ℕ =
 λ(m n) ℕ-elim m ℕ (+ n) 0
@@ -86,8 +127,140 @@ let * : ℕ → ℕ → ℕ =
 let ^ : ℕ → ℕ → ℕ =
 λ(m n) ℕ-elim n ℕ (* m) 1
 
+let zero? : ℕ → 𝔹 =
+λ(n) ℕ-elim n 𝔹 (λ(_) false) true
+
+let zero?-correct : ∀ (n : ℕ) ≡ ℕ 0 n → ≡ 𝔹 true (zero? n) =
+λ(n 0≡n) 0≡n (λ(x) ≡ 𝔹 true (zero? x)) (refl 𝔹 true)
+
+let ≤ᵇ : ℕ → ℕ → 𝔹 =
+λ(m n) zero? (- m n)
+
+let ≥ᵇ : ℕ → ℕ → 𝔹 =
+λ(m n) ≤ᵇ n m
+
+let <ᵇ : ℕ → ℕ → 𝔹 =
+λ(m n) if (&& (zero? m) (zero? n)) 𝔹 false (≤ᵇ m (pred n))
+
+let >ᵇ : ℕ → ℕ → 𝔹 =
+λ(m n) <ᵇ n m
+
 let 1+1≡2 : ≡ ℕ (+ 1 1) 2 = refl ℕ 2
 
 let 2*3≡6 : ≡ ℕ (* 2 3) 6 = refl ℕ 6
 
 let 3^2≡9 : ≡ ℕ (^ 3 2) 9 = refl ℕ 9
+
+let 4<ᵇ5 : ≡ 𝔹 (<ᵇ 4 5) true = refl 𝔹 true
+
+let ∞-ℕ : ∀ (n : ℕ) Σ ℕ λ(m) ≡ ℕ (+ n 1) m =
+λ(n) λ(_ elim) elim (+ n 1) (refl ℕ (+ n 1)) 
+
+let ≤ : ℕ → ℕ → Prop =
+λ(x y) ∀ (C : ℕ → ℕ → Prop) (∀ (n : ℕ) C 0 n) → (∀ (m n : ℕ) C m n → C (S m) (S n)) → C x y
+
+let Z≤Z : ∀ (n : ℕ) ≤ 0 n =
+λ(n C b h) b n
+
+let S≤S : ∀ (x y : ℕ) ≤ x y → ≤ (S x) (S y) =
+λ(x y m≤n C b h) h x y (m≤n C b h)
+
+
+let List : Prop → Prop =
+λ(A) ∀ (B : Prop) (A → B → B) → B → B
+
+let [] : ∀ (A : Prop) List A =
+λ(A B g z) z
+
+let ∷ : ∀ (A : Prop) A → List A → List A =
+λ(A x xs) λ(B g z) g x (xs B g z)
+
+let foldr : ∀ (A : Prop) List A → ∀ (B : Prop) (A → B → B) → B → B =
+λ(_ x) x
+
+let map : ∀ (A B : Prop) (A → B) → List A → List B =
+λ(A B f xs) xs (List B) (λ(x xs) ∷ B (f x) xs) ([] B)
+
+
+let xs : List ℕ = ∷ ℕ 0 (∷ ℕ 1 (∷ ℕ 2 ([] ℕ)))
+
+let Maybe : Prop → Prop =
+λ(A) ∨ A 𝟙
+
+let Some : ∀(A : Prop) A → Maybe A = λ(A) inj₁ A 𝟙
+let None : ∀(A : Prop) Maybe A = λ(A) inj₂ A 𝟙 tt
+
+let _ : Maybe (List ℕ) = None (List ℕ)
+let _ : Maybe (List ℕ) = Some (List ℕ) (∷ ℕ 1 ([] ℕ))
+
+let hd : ∀ (A : Prop) List A → Maybe A =
+λ(A xs) foldr A xs (Maybe A) (λ(x xs) Some A x) (None A)
+
+let Vec : Prop → ℕ → Prop =
+λ(A n) ∀ (B : ℕ → Prop) (∀ (m : ℕ) A → B m → B (S m)) → B 0 → B n 
+
+let <> : ∀ (A : Prop) Vec A 0 =
+λ(A) λ(B g z) z
+
+let vcons : ∀ (A : Prop)(n : ℕ) A → Vec A n → Vec A (S n) =
+λ(A n x xs) λ(B g z) g n x (xs B g z)
+
+let ∃ : (Prop → Prop) → Prop =
+λ(P) ∀ (C : Prop) (∀ (t : Prop) P t → C) → C
+
+let pack : ∀ (t : Prop) (P : Prop → Prop) P t → ∃ P =
+λ(t P imp) λ(C f) f t imp
+
+let unpack : ∀ (P : Prop → Prop) ∃ P → ∀ (C : Prop) (∀ (t : Prop) P t → C) → C =
+λ(P x) x
+
+let MONOID : Prop → Prop = λ(M) ∧ M (M → M → M)
+
+let M/* : ∀ (M : Prop) MONOID M → M → M → M =
+λ(M C) π₂ M (M → M → M) C
+
+let M/unit : ∀ (M : Prop) MONOID M → M =
+λ(M C) π₁ M (M → M → M) C
+
+let M/mk : ∀ (M : Prop) M → (M → M → M) → MONOID M =
+λ(M unit *) pair M (M → M → M) unit *
+
+
+let MONOID-VERIFIED : Prop → Prop =
+λ(M)
+  Σ M λ(unit)
+  Σ (M → M → M) λ(*)
+  ∧
+    (∧
+      (∀ (a : M) ≡ M (* unit a) a)
+      (∀ (a : M) ≡ M (* a unit) a))
+    (∀ (a b c : M) ≡ M (* a (* b c)) (* (* a b) c))
+
+let Monoid-ℕ-+ : MONOID ℕ =
+M/mk ℕ 0 +
+
+let Monoid-ℕ-* : MONOID ℕ =
+M/mk ℕ 1 *
+
+let f : ∀ (M : Prop)  MONOID M → M =
+λ(M C) M/* M C (M/unit M C) (M/unit M C)
+
+let foldMap : ∀ (A M : Prop) MONOID M → (A → M) → List A → M =
+λ(A M C f xs) (map A M f xs) M (M/* M C) (M/unit M C)
+
+let sum : List ℕ → ℕ = foldMap ℕ ℕ Monoid-ℕ-+ (id ℕ)
+let prod : List ℕ → ℕ = foldMap ℕ ℕ Monoid-ℕ-* (id ℕ)
+
+let xs = ∷ ℕ 1 (∷ ℕ 2 (∷ ℕ 3 (∷ ℕ 4 ([] ℕ))))
+
+
+let EM : Prop = ∀ (A : Prop) ∨ A (¬ A)
+let DNE : Prop = ∀ (A : Prop) ¬ (¬ A) → A
+
+let EM→DNE : EM → DNE = 
+λ(em A ¬¬A) (em A) A (λ(a) a) (λ(¬a) (¬¬A ¬a) A)
+
+let DNE→EM : DNE → EM =
+λ(dne A) λ(C a→c ¬a→c) dne C (λ(¬c) ¬c (¬a→c λ(a) ¬c (a→c a)))
+
+

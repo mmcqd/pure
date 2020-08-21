@@ -6,7 +6,7 @@ open Pure
 open P
 
 let arrow = symbol "->" <|> symbol "→" 
-let forall = symbol "\\/" <|> symbol "∀"
+let forall = symbol "\\/" <|> symbol "∀" <|> symbol "Π"
 let lambda = symbol "\\" <|> symbol "λ"
 
 let rec expr i = chainr1 expr1 (arrow *> return (fun t1 t2 -> PI (("",t1),t2))) i
@@ -21,7 +21,11 @@ let rec expr i = chainr1 expr1 (arrow *> return (fun t1 t2 -> PI (("",t1),t2))) 
                          symbol ":" *>
                          expr) i
 
-    and sort i = ((fun s -> SORT s) <$> List.fold_right (<|>) (List.map symbol T.sorts) fail) i
+    and sort i = ((fun s -> SORT s) <$> 
+                  let* v = variable in 
+                  if List.mem v T.sorts
+                  then return v 
+                  else fail) i
   
     and var i = ((fun v -> F v) <$> variable) i
 

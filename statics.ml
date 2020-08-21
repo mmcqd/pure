@@ -25,7 +25,7 @@ let rec synth ((g,d) as c) = function
       | F x -> 
           begin
           match Context.find_opt x g with 
-            | Some a -> go (try synth c a with TypeError s -> raise (TypeError (s^" Caused by: '"^pretty a^"'"))); a 
+            | Some a -> go @@ synth c a; a 
             | _ -> raise (TypeError ("Unbound var: '"^x^"'"))
           end
       | B _ -> raise (Failure "Should never be type checking a bound var")

@@ -27,7 +27,7 @@ let post p = p <* ignore
 let symbol s = post (string s)
 
 let illegal_chr = ['\\';'(';')';' ';'\t';'\n';'%';',';':';'=']
-let illegal_str = ["let";"->";"→";"∀";"λ"]  
+let illegal_str = ["let";"->";"→";"∀";"λ";"Π"]  
 let variable = 
   post (let* v = ident illegal_chr in if List.mem v illegal_str then fail else return v)
 
@@ -44,9 +44,9 @@ let pair p s = (fun x y -> (x,y)) <$> (p <* s) <*> p
 let triple p s = (fun x y z -> (x,y,z)) <$> (p <* s) <*> (p <* s) <*> p
 let ax = pair variable (symbol ":")
 let rule = triple variable (symbol ",")
-let sorts = symbol "%SORTS" *> sepby1 variable (symbol "|")
-let axioms = symbol "%AXIOMS" *> sepby1 ax (symbol "|")
-let rules = symbol "%RULES" *> sepby1 rule (symbol "|")
+let sorts = symbol "%SORTS" *> sepby variable (symbol "|")
+let axioms = symbol "%AXIOMS" *> sepby ax (symbol "|")
+let rules = symbol "%RULES" *> sepby rule (symbol "|")
 
 let pragmas = pre ((fun x y z -> (x,y,z)) <$> sorts <*> axioms <*> rules)
 
