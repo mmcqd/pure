@@ -263,4 +263,3 @@ let EM→DNE : EM → DNE =
 let DNE→EM : DNE → EM =
 λ(dne A) λ(C a→c ¬a→c) dne C (λ(¬c) ¬c (¬a→c λ(a) ¬c (a→c a)))
 
-
