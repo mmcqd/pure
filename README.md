@@ -3,7 +3,7 @@ This is an interpreter for arbitrary pure type systems. Check [here](https://en.
 
 Pure uses bidirectional type checking, so it's typing rules are slightly different from the ones listed on wikipedia. Here are the typing rules, inspired by the recipe for bidirectionalization in the paper [Bidirectional Typechecking](https://arxiv.org/abs/1908.05839).
 
-![Rules](https://i.imgur.com/Dz2MaEA.png)
+![Rules](https://i.imgur.com/je1Cumj.png)
  
 Oleg Grenrus has a [blog post](https://oleg.fi/gists/posts/2020-08-03-bidi-pts.html) on bidirectional type checking for pure type systems. I've only skimmed it, but we seem to have come up with pretty much the same set of rules. He goes somewhat deeper in exploring the idea than I do with Pure, however.
 
@@ -25,11 +25,15 @@ The top of every `.pure` file must contain 3 interpreter pragmas: `%SORTS`, `%AX
 These define the system that the rest of the file will be type checked against. The rest of the file can be zero or more declarations.
 
 Declarations are in OCaml style, using `let` with an optional type annotation.
+
+Use of unicode characters in names and as alternatives to `\/`,`->`,and `\` is supported.
 ```
 let id = \(A : Type)(x : A) x
 let id : \/(A : Type) A -> A = \(A)\(x) x
 let f : \/(A B : Type) (A -> A -> B) -> A -> A -> B = \(A B : Type)(f : A -> A -> B)(x y : A) f x y
 let g : \/(A B : Type) (A -> A -> B) -> A -> A -> B = \(_ _ f x y) f x y
+let ℕ : Prop = ∀ (A : Prop) (A → A) → A → A
+let Z : ℕ = λ(_ _ x) x 
 ```
 Lambda functions have optional type annotations on their arguments. If none are provided, Pure will try to infer the type of the function. 
 A function declared at the top level with no annotations on it's arguments cannot have it's type inferred, so an annoation on the declaration becomes necessary.
@@ -70,13 +74,10 @@ Check out the `examples` folder for more... examples. In `coc.pure`, I prove tha
 
 ### System U
 ```
-%SORTS * | BOX | TRI
-%AXIOMS * : BOX | BOX : TRI
-%RULES *,*,* | BOX,*,* | BOX,BOX,BOX | TRI,*,* | TRI,BOX,BOX
+%SORTS * | □ | △
+%AXIOMS * : □ | □ : △
+%RULES *,*,* | □,*,* | □,□,□ | △,*,* | △,□,□
 ```
-
-I'll note that in all of these systems, the last two elements of each RULE triple are the same. The only type system off the top of my head where this is not the  case is one with an infinite heirachy of universes, but this is not expressible using Pure, since we'd need a RULE like `forall s1,s2. s1,s2,max(s1,s2)`.
-
 
 
 
