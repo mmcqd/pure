@@ -32,7 +32,7 @@ let id = \(A : Type)(x : A) x
 let id : \/(A : Type) A -> A = \(A)\(x) x
 let f : \/(A B : Type) (A -> A -> B) -> A -> A -> B = \(A B : Type)(f : A -> A -> B)(x y : A) f x y
 let g : \/(A B : Type) (A -> A -> B) -> A -> A -> B = \(_ _ f x y) f x y
-let ℕ : Prop = ∀ (A : Prop) (A → A) → A → A
+let ℕ : Type = ∀ (A : Type) (A → A) → A → A
 let Z : ℕ = λ(_ _ x) x 
 ```
 Lambda functions have optional type annotations on their arguments. If none are provided, Pure will try to infer the type of the function. 
